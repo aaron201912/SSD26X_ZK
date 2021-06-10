@@ -49,7 +49,7 @@ INCLUDE_DIR :=  -I$(EASYUI_COMMON_INCLUDE) \
                 
 
 LDFLAGS = -leasyui -lpthread -lmi_common -lmi_sys -lmi_sensor -lmi_vif -lmi_isp -lmi_scl -lmi_venc \
-		-lmi_disp -lmi_hdmi -lmi_panel -lmi_vdec -lmi_rgn -lmi_iqserver -lmi_gfx \
+		-lmi_disp -lmi_hdmi -lmi_panel -lmi_vdec -lmi_rgn -lmi_iqserver -lmi_gfx  -lmi_ai -lmi_ao \
 		-lcus3a -lispalgo -lfbc_decode	-lcam_fs_wrapper -lcam_os_wrapper \
 		-ldl -lrt -fPIC -shared
 

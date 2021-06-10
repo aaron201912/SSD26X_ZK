@@ -467,6 +467,8 @@ static bool onmainActivityTouchEvent(const MotionEvent &ev) {
     return false;
 }
 const char* IconTab[]={
+	"dualsensorActivity",
+	"playPcmFileActivity",
 	"testTextActivity",
 	"testSliderActivity",
 	"testButtonActivity",
@@ -475,8 +477,7 @@ const char* IconTab[]={
 	"qrcodeActivity",
 	"animationActivity",
 	"waveViewActivity",
-	"localsettingActivity",
-	"dualsensorActivity"
+	"localsettingActivity"
 };
 
 static void onSlideItemClick_Slidewindow1(ZKSlideWindow *pSlideWindow, int index) {
