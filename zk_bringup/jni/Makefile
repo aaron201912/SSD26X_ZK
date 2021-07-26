@@ -45,8 +45,7 @@ INCLUDE_DIR :=  -I$(EASYUI_COMMON_INCLUDE) \
                 -I ../jni/internal/disp \
                 -I ../jni/internal/hdmi \
                 -I ../jni/internal/rgn \
-                -I ../jni/dualsensor \
-                
+                -I ../jni/dualsensor
 
 LDFLAGS = -leasyui -lpthread -lmi_common -lmi_sys -lmi_sensor -lmi_vif -lmi_isp -lmi_scl -lmi_venc \
 		-lmi_disp -lmi_hdmi -lmi_panel -lmi_vdec -lmi_rgn -lmi_iqserver -lmi_gfx  -lmi_ai -lmi_ao \
@@ -54,6 +53,9 @@ LDFLAGS = -leasyui -lpthread -lmi_common -lmi_sys -lmi_sensor -lmi_vif -lmi_isp 
 		-ldl -lrt -fPIC -shared
 
 LDFLAGS += -L$(ZKSW_PREBUILT_LIB_PATH)/system -L. -L ../jni/sdkdir/lib
+
+#LDFLAGS += -DUSE_ONE_SENSOR -DSENSOR_PAD=0
+
 INCLUDE_DIR += -I ../jni/hotplugdetect -I ../jni/hotplugdetect/common -I ../jni/hotplugdetect/usbdetect -I ../jni/hotplugdetect/wifidetect \
                -I ../jni/hotplugdetect/wirednetworkdetect
 

@@ -60,6 +60,10 @@ rights to any and all damages, losses, costs and expenses resulting therefrom.
 #define ALIGN_DOWN(val, alignment) (((val)/(alignment))*(alignment))
 #endif
 
+#if defined(USE_ONE_SENSOR) && !defined(SENSOR_PAD)
+#define SENSOR_PAD 0
+#endif
+
 #define TO_SYS_CHN_ID(layerid,portid) \
 ({\
     int chnid = 0;\
@@ -166,8 +170,13 @@ typedef struct ST_Display_Opt_s
     MI_DISP_OutputTiming_e u32HdmiDispTiming;
 }ST_Display_Opt_t;
 
+#ifdef USE_ONE_SENSOR
+#define SENSOR_IDX_FOR_PANEL 0
+#define SENSOR_IDX_FOR_HDMI 0
+#else
 #define SENSOR_IDX_FOR_PANEL 1
 #define SENSOR_IDX_FOR_HDMI 0
+#endif
 
 static ST_Sensor_Attr_t gstSensorAttr[ST_MAX_SENSOR_NUM] =
 {
@@ -175,16 +184,26 @@ static ST_Sensor_Attr_t gstSensorAttr[ST_MAX_SENSOR_NUM] =
     {
         .bUsed = 1,
         .bDoFr = 0,
+    #ifdef USE_ONE_SENSOR
+        .eSensorPadID = (MI_VIF_SNRPad_e)SENSOR_PAD,
+        .u32VifGroupID = 2 * SENSOR_PAD,
+        .u32BindVifDev = 8 * SENSOR_PAD,
+    #else
         .eSensorPadID = E_MI_VIF_SNRPAD_ID_0,
         .u32VifGroupID = 0,
         .u32BindVifDev = 0,
+    #endif
         .bPlaneMode = 1,
         .u8ResIndex = 0/* 3840*2160,20fps @imx415 res 0 */,
         .s8IqPath = (char*)"/customer/mi_demo/imx415_api.bin",
     },
     [1] =
     {
+    #ifdef USE_ONE_SENSOR
+        .bUsed = 0,
+    #else
         .bUsed = 1,
+    #endif
         .bDoFr = 1,
         .eSensorPadID = E_MI_VIF_SNRPAD_ID_1,
         .u32VifGroupID = 2,
