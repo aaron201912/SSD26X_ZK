@@ -81,6 +81,10 @@ typedef enum
     E_MI_HDMI_TIMING_1280x800_60P    = 40,
     E_MI_HDMI_TIMING_1366x768_60P    = 41,
     E_MI_HDMI_TIMING_1680x1050_60P   = 42,
+    E_MI_HDMI_TIMING_1920x1080_5994P = 43,
+    E_MI_HDMI_TIMING_1920x1080_2997P = 44,
+    E_MI_HDMI_TIMING_1280x720_5994P  = 45,
+    E_MI_HDMI_TIMING_1280x720_2997P  = 46,
     E_MI_HDMI_TIMING_MAX,
 } MI_HDMI_TimingType_e;
 
@@ -275,7 +279,8 @@ typedef struct MI_HDMI_VideoAttr_s
     MI_BOOL bEnableVideo;
     MI_HDMI_TimingType_e eTimingType;
     MI_HDMI_OutputMode_e eOutputMode;
-    MI_HDMI_ColorType_e eColorType;
+    MI_HDMI_ColorType_e eColorType;   //output color type
+    MI_HDMI_ColorType_e eInColorType; //input color type
     MI_HDMI_DeepColor_e eDeepColorMode;
 } MI_HDMI_VideoAttr_t;
 

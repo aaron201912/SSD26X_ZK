@@ -18,7 +18,7 @@ rights to any and all damages, losses, costs and expenses resulting therefrom.
 #include "mi_vdec_datatype.h"
 
 #define VDEC_MAJOR_VERSION 3
-#define VDEC_SUB_VERSION 2
+#define VDEC_SUB_VERSION 3
 #define MACRO_TO_STR(macro) #macro
 #define VDEC_VERSION_STR(major_version,sub_version) ({char *tmp = sub_version/100 ? \
                                     "mi_vdec_version_" MACRO_TO_STR(major_version)"." MACRO_TO_STR(sub_version) : sub_version/10 ? \
@@ -52,11 +52,15 @@ MI_S32 MI_VDEC_ReleaseUserData(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_VDEC
 MI_S32 MI_VDEC_SetDisplayMode(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_VDEC_DisplayMode_e eDisplayMode);
 MI_S32 MI_VDEC_GetDisplayMode(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_VDEC_DisplayMode_e *peDisplayMode);
 MI_S32 MI_VDEC_SetOutputPortAttr(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_VDEC_OutputPortAttr_t *pstOutputPortAttr);
+MI_S32 MI_VDEC_SetOutputPortAttrEx(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_U32 u32Port, MI_VDEC_OutputPortAttr_t *pstOutputPortAttr);
 MI_S32 MI_VDEC_GetOutputPortAttr(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_VDEC_OutputPortAttr_t *pstOutputPortAttr);
+MI_S32 MI_VDEC_GetOutputPortAttrEx(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_U32 u32Port, MI_VDEC_OutputPortAttr_t *pstOutputPortAttr);
 MI_S32 MI_VDEC_SetOutputPortLayoutMode(MI_VDEC_DEV VdecDev, MI_VDEC_OutbufLayoutMode_e eBufTileMode);
 MI_S32 MI_VDEC_GetOutputPortLayoutMode(MI_VDEC_DEV VdecDev, MI_VDEC_OutbufLayoutMode_e *peBufTileMode);
 MI_S32 MI_VDEC_SetDestCrop(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_VDEC_CropCfg_t *pstCropCfg);
+MI_S32 MI_VDEC_SetDestCropEx(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_U32 u32Port, MI_VDEC_CropCfg_t *pstCropCfg);
 MI_S32 MI_VDEC_GetDestCrop(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_VDEC_CropCfg_t *pstCropCfg);
+MI_S32 MI_VDEC_GetDestCropEx(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_U32 u32Port, MI_VDEC_CropCfg_t *pstCropCfg);
 MI_S32 MI_VDEC_SetChnErrHandlePolicy(MI_VDEC_DEV VdecDev, MI_VDEC_CHN VdecChn, MI_VDEC_ErrHandlePolicy_t *pstErrHandlePolicy);
 
 #ifdef __cplusplus

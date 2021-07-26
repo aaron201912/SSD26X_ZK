@@ -60,6 +60,8 @@ typedef struct MI_LDC_ChnParam_s
     MI_BOOL bUseProjection3x3Matrix;
     MI_S32 as32Projection3x3Matrix[LDC_MAXTRIX_NUM];
 
+    MI_U16 u16FocalLength;
+
     void *pConfigAddr;
     MI_U32 u32ConfigSize;
     union

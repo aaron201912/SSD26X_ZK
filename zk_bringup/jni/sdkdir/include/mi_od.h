@@ -92,6 +92,17 @@ typedef struct MI_OD_param_s
     int32_t min_duration;
 } MI_OD_param_t;
 
+typedef struct MI_OD_sc_param_s
+{
+    int32_t blocksize;
+    int32_t search_range;
+    uint8_t thd_ratio_zero_mv;
+    uint8_t thd_ratio_max_mv;
+    uint8_t thd_accu_dir_cnt;
+    uint8_t sc_min_duration;
+    uint8_t thd_sc_cnt_duration;
+} MI_OD_sc_param_t;
+
 typedef void* OD_HANDLE;
 
 uint32_t MI_OD_GetLibVersion();
@@ -102,6 +113,9 @@ MI_OD_WIN_STATE    MI_OD_GetWindowResult(OD_HANDLE odHandle, uint8_t col, uint8_
 MI_OD_RET MI_OD_SetAttr(OD_HANDLE odHandle, MI_OD_param_t *param);
 MI_OD_RET MI_OD_GetAttr(OD_HANDLE odHandle, MI_OD_param_t *param);
 void MI_OD_Uninit(OD_HANDLE odHandle);
+MI_OD_RET MI_OD_AlarmReset(OD_HANDLE odHandle, uint8_t enable, uint8_t reset_duration);
+MI_OD_RET MI_OD_ExcludeSceneChange(OD_HANDLE odHandle, uint8_t enable, MI_OD_sc_param_t *sc_param);
+
 #ifdef __cplusplus
 }
 #endif

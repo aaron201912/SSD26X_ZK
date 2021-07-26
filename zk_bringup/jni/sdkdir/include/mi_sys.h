@@ -19,7 +19,7 @@ rights to any and all damages, losses, costs and expenses resulting therefrom.
 #include "mi_sys_datatype.h"
 
 #define SYS_MAJOR_VERSION 3
-#define SYS_SUB_VERSION 1
+#define SYS_SUB_VERSION 3
 #define MACRO_TO_STR(macro) #macro
 #define SYS_VERSION_STR(major_version, sub_version)                                                            \
     ({                                                                                                         \
@@ -137,6 +137,13 @@ MI_S32 MI_SYS_Mmap(MI_U64 phyAddr, MI_U32 u32Size, void **ppVirtualAddress, MI_B
 
 MI_S32 MI_SYS_Munmap(void *pVirtualAddress, MI_U32 u32Size);
 MI_S32 MI_SYS_FlushInvCache(void *pVirtualAddress, MI_U32 u32Length);
+
+MI_S32 MI_SYS_ChnInputPortSetUserPicture(MI_SYS_BUF_HANDLE BufHandle, MI_SYS_BufInfo_t *pstBufInfo,
+                                         MI_SYS_UserPictureInfo_t *pstUserPictureInfo);
+
+MI_S32 MI_SYS_EnableUserPicture(MI_SYS_BUF_HANDLE BufHandle);
+
+MI_S32 MI_SYS_DisableUserPicture(MI_SYS_BUF_HANDLE BufHandle);
 
 #ifdef __cplusplus
 }

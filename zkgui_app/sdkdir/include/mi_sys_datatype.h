@@ -153,6 +153,9 @@ typedef enum {
     E_MI_SYS_PIXEL_FRAME_YUV422_YVYU,
     E_MI_SYS_PIXEL_FRAME_YUV422_VYUY,
 
+    E_MI_SYS_PIXEL_FRAME_YUV422_PLANAR,
+    E_MI_SYS_PIXEL_FRAME_YUV420_PLANAR,
+
     E_MI_SYS_PIXEL_FRAME_FBC_420,
 
     E_MI_SYS_PIXEL_FRAME_RGB_BAYER_BASE,
@@ -470,5 +473,10 @@ typedef struct MI_SYS_InitParam_s
     MI_U32 u32DevId;
     MI_U8* u8Data;
 } MI_SYS_InitParam_t;
+
+typedef struct MI_SYS_UserPictureInfo_s
+{
+    MI_U32 u32SrcFrc;
+} MI_SYS_UserPictureInfo_t;
 
 #endif ///_MI_SYS_DATATYPE_H_

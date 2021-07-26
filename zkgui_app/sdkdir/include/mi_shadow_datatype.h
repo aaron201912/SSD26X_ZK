@@ -17,7 +17,7 @@ rights to any and all damages, losses, costs and expenses resulting therefrom.
 
 #include "mi_sys_datatype.h"
 
-#define MI_SHADOW_DUMP_BUFFER_SIZE (12 * 1024)
+#define MI_SHADOW_DUMP_BUFFER_SIZE (32 * 1024)
 
 /* SHADOW Module ErrorCode */
 #define MI_ERR_SHADOW_INVALID_DEVID MI_DEF_ERR(E_MI_MODULE_ID_SHADOW, E_MI_ERR_LEVEL_ERROR, E_MI_ERR_INVALID_DEVID)

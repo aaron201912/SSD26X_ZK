@@ -115,9 +115,16 @@ typedef enum
     E_MI_DISP_OUTPUT_1920x1200_60,          /* VESA 1920 x 1600 at 60 Hz (non-interlaced) CVT (Reduced Blanking)*/
 
     E_MI_DISP_OUTPUT_2560x1440_30,          /* 2560x1440_30 */
+    E_MI_DISP_OUTPUT_2560x1440_50,          /* 2560x1440_50 */
+    E_MI_DISP_OUTPUT_2560x1440_60,          /* 2560x1440_60 */
     E_MI_DISP_OUTPUT_2560x1600_60,          /* 2560x1600_60 */
+    E_MI_DISP_OUTPUT_3840x2160_25,          /* 3840x2160_25 */
     E_MI_DISP_OUTPUT_3840x2160_30,          /* 3840x2160_30 */
     E_MI_DISP_OUTPUT_3840x2160_60,          /* 3840x2160_60 */
+    E_MI_DISP_OUTPUT_1920x1080_5994,      /* 1920x1080_59.94 */
+    E_MI_DISP_OUTPUT_1920x1080_2997,      /* 1920x1080_29.97 */
+    E_MI_DISP_OUTPUT_1280x720_5994,       /* 1280X720_59.94 */
+    E_MI_DISP_OUTPUT_1280x720_2997,       /* 1280x720_29.97 */
     E_MI_DISP_OUTPUT_USER,
     E_MI_DISP_OUTPUT_MAX,
 } MI_DISP_OutputTiming_e;
@@ -208,10 +215,12 @@ typedef struct MI_DISP_SyncInfo_s
     MI_BOOL  bIop;      /* interlaced or progressive display(0:i; 1:p) */
     MI_U8    u8Intfb;   /* interlace bit width while output */
 
-    MI_U16   u16Vact ;  /* vertical active area */
+    MI_U16   u16VStart;  /* vertical de start */
+    MI_U16   u16Vact;  /* vertical active area */
     MI_U16   u16Vbb;    /* vertical back blank porch */
     MI_U16   u16Vfb;    /* vertical front blank porch */
 
+    MI_U16   u16HStart;   /* herizontal de start */
     MI_U16   u16Hact;   /* herizontal active area */
     MI_U16   u16Hbb;    /* herizontal back blank porch */
     MI_U16   u16Hfb;    /* herizontal front blank porch */

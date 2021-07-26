@@ -19,7 +19,6 @@ rights to any and all damages, losses, costs and expenses resulting therefrom.
 extern "C" {
 #endif
 #include "mi_common.h"
-#include "mi_gfx_datatype.h"
 
 typedef enum
 {
