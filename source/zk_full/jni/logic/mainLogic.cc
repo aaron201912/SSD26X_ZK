@@ -473,7 +473,7 @@ const char* IconTab[]={
 	"animationActivity",
 	"waveViewActivity",
 	"localMediaActivity",
-	"playlistActivity",
+	"playPcmFileActivity",
 	"localsettingActivity"
 };
 
