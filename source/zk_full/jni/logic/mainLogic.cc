@@ -472,6 +472,7 @@ const char* IconTab[]={
 	"qrcodeActivity",
 	"animationActivity",
 	"waveViewActivity",
+	"dualsensorActivity",
 	"localMediaActivity",
 	"playPcmFileActivity",
 	"localsettingActivity"
