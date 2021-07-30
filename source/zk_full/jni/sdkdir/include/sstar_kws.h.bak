@@ -1,0 +1,60 @@
+/*
+ *
+ *  SStar License
+ *
+ *
+ *
+ *
+ *
+ */
+
+#ifndef _SSTAR_KWS_H
+#define _SSTAR_KWS_H
+
+#ifdef __cplusplus
+extern    "C"
+{
+#endif
+#if 0
+#define SRATE     16000
+#define CHUNK     32*6       // ms
+#define MAX_BUF   784*16*2   // 784ms, byte
+
+#define E_KWS     1
+#define E_SOURCE  10
+#define E_FEATURE 20
+#define E_NN      30
+#define E_DNN     40
+#define E_DSCNN   50
+#endif
+typedef struct KWSInit {
+    int sample_rate;
+    int chunk_len;          // unit is byte
+    int nn_type;
+    float threshold[256];
+} KWSInit_s;
+
+// init internal buf
+int kws_init(KWSInit_s *init, const char* model_file);
+
+// get support command
+const char **kws_getcmd(int *num);
+
+// send chunk buf to kws, return word index
+int kws_senddata(short *buf, int len);
+
+int kws_predict(int *ret_index);
+
+
+// free internal buffer alloc by init
+int kws_free(void);
+
+int kws_test();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+
+

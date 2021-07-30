@@ -122,4 +122,6 @@
     <string name="language_setting">语言设置（中/英）：</string>
     <string name="language_cn">中文</string>
     <string name="language_en">英语</string>
+    <string name="icon_glassdetect">玻璃碎检测</string>
+    <string name="icon_commanddetect">命令词检测</string>
 </resources>

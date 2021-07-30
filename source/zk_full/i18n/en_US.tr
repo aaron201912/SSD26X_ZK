@@ -122,4 +122,6 @@
     <string name="language_setting">Language Setting(Chinese/English):</string>
     <string name="language_cn">Chinese</string>
     <string name="language_en">English</string>
+    <string name="icon_glassdetect">Glass Detection</string>
+    <string name="icon_commanddetect">Command Detection</string>
 </resources>

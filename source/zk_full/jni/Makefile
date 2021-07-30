@@ -52,11 +52,13 @@ INCLUDE_DIR :=  -I$(EASYUI_COMMON_INCLUDE) \
                 -I ../jni/internal/disp \
                 -I ../jni/internal/hdmi \
                 -I ../jni/internal/rgn \
-                -I ../jni/dualsensor
+                -I ../jni/dualsensor \
+                -I ../jni/aed_kws_detect  
 
 LDFLAGS = -leasyui -lpthread -lmi_common -lmi_sys -lmi_sensor -lmi_vif -lmi_isp -lmi_scl -lmi_venc \
         -lmi_disp -lmi_hdmi -lmi_panel -lmi_vdec -lmi_rgn -lmi_iqserver -lmi_gfx  -lmi_ai -lmi_ao \
-        -lmi_wlan -lcus3a -lispalgo -lfbc_decode	-lcam_fs_wrapper -lcam_os_wrapper \
+        -lmi_wlan -lcus3a -lispalgo -lfbc_decode -lcam_fs_wrapper -lcam_os_wrapper -laed -lkws \
+        -lAPC_LINUX \
         -lcjson -ldl -lrt -fPIC -shared
 
 LDFLAGS += -L$(ZKSW_PREBUILT_LIB_PATH)/system -L. -L ../jni/sdkdir/lib
