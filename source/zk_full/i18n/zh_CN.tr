@@ -23,6 +23,7 @@
     <string name="icon_scanner">二维码扫描</string>
     <string name="icon_str">STR</string>
     <string name="icon_dualsensorpreview">双屏预览</string>
+    <string name="icon_facerecognition">人脸识别</string>
     <string name="icon_browser">浏览器</string>
     <string name="text_implement">如何实现？</string>
     <string name="text_content">      我们专注于嵌入式设备终端的人机交互解决方案。为各行业客户提供硬件、系统、HMI开发套件，助力于降低各行业在嵌入式人机交互的投入成本和开发时间。让客户产品可以快速稳定的推向市场是我们一直努力的目标。</string>

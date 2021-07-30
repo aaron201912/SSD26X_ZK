@@ -58,7 +58,7 @@ static void onUI_intent(const Intent *intentPtr) {
         //TODO
     }
 
-    SSTAR_DualSensorInit();
+    SSTAR_DualSensorInit(0, 0);
 }
 
 /*

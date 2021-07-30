@@ -1,18 +1,3 @@
-/* SigmaStar trade secret */
-/* Copyright (c) [2019~2020] SigmaStar Technology.
-All rights reserved.
-
-Unless otherwise stipulated in writing, any and all information contained
-herein regardless in any format shall remain the sole proprietary of
-SigmaStar and be kept in strict confidence
-(SigmaStar Confidential Information) by the recipient.
-Any unauthorized act including without limitation unauthorized disclosure,
-copying, use, reproduction, sale, distribution, modification, disassembling,
-reverse engineering and compiling of the contents of SigmaStar Confidential
-Information is unlawful and strictly prohibited. SigmaStar hereby reserves the
-rights to any and all damages, losses, costs and expenses resulting therefrom.
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -60,8 +45,12 @@ rights to any and all damages, losses, costs and expenses resulting therefrom.
 #define ALIGN_DOWN(val, alignment) (((val)/(alignment))*(alignment))
 #endif
 
-#if defined(USE_ONE_SENSOR) && !defined(SENSOR_PAD)
-#define SENSOR_PAD 0
+#if defined(USE_ONE_SENSOR)
+#if !defined(SENSOR_PAD)
+MI_VIF_SNRPad_e g_eSensorPad = 0;
+#else
+MI_VIF_SNRPad_e g_eSensorPad = SENSOR_PAD;
+#endif
 #endif
 
 #define TO_SYS_CHN_ID(layerid,portid) \
@@ -171,11 +160,11 @@ typedef struct ST_Display_Opt_s
 }ST_Display_Opt_t;
 
 #ifdef USE_ONE_SENSOR
-#define SENSOR_IDX_FOR_PANEL 0
-#define SENSOR_IDX_FOR_HDMI 0
+int g_s32SensorIdxForPanel = 0;
+int g_s32SensorIdxForHdmi = 0;
 #else
-#define SENSOR_IDX_FOR_PANEL 1
-#define SENSOR_IDX_FOR_HDMI 0
+int g_s32SensorIdxForPanel = 1;
+int g_s32SensorIdxForHdmi = 0;
 #endif
 
 static ST_Sensor_Attr_t gstSensorAttr[ST_MAX_SENSOR_NUM] =
@@ -185,9 +174,9 @@ static ST_Sensor_Attr_t gstSensorAttr[ST_MAX_SENSOR_NUM] =
         .bUsed = 1,
         .bDoFr = 0,
     #ifdef USE_ONE_SENSOR
-        .eSensorPadID = (MI_VIF_SNRPad_e)SENSOR_PAD,
-        .u32VifGroupID = 2 * SENSOR_PAD,
-        .u32BindVifDev = 8 * SENSOR_PAD,
+        .eSensorPadID = (MI_VIF_SNRPad_e)g_eSensorPad,
+        .u32VifGroupID = 2 * g_eSensorPad,
+        .u32BindVifDev = 8 * g_eSensorPad,
     #else
         .eSensorPadID = E_MI_VIF_SNRPAD_ID_0,
         .u32VifGroupID = 0,
@@ -278,7 +267,7 @@ static void ST_Usage()
     printf("      -h: help\n");
 }
 
-#ifdef ENABLE_FR
+#if 1//def ENABLE_FR
 extern MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
                         MI_U16 u16SrcWidth, MI_U16 u16SrcHeight,
                         MI_SCL_PORT rgnPort, MI_SCL_PORT capPort);
@@ -1294,7 +1283,7 @@ MI_S32 ST_DisplayFlowInit(ST_Display_Opt_t *pstDisplayOpt, int inputCnt)
     if(pstDisplayOpt->bUsedPanel)
     {
         SclDevId = 0;
-        SclChnId = gstSensorAttr[SENSOR_IDX_FOR_PANEL].eSensorPadID;
+        SclChnId = gstSensorAttr[g_s32SensorIdxForPanel].eSensorPadID;
         SclOutPortId =0;
         s32DispLayer = pstDisplayOpt->s32PanelLayer;
         u8DispInport = pstDisplayOpt->u8PanelInputPort;
@@ -1478,7 +1467,7 @@ MI_S32 ST_DisplayFlowInit(ST_Display_Opt_t *pstDisplayOpt, int inputCnt)
             u8DispInport = 0;
             //for(u8DispInport = 0; u8DispInport < inputCnt; u8DispInport++)
             {
-                SclChnId = gstSensorAttr[SENSOR_IDX_FOR_HDMI].eSensorPadID;
+                SclChnId = gstSensorAttr[g_s32SensorIdxForHdmi].eSensorPadID;
                 memset(&stWinRect, 0x0, sizeof(MI_DISP_VidWinRect_t));
                 memset(&stInputPortAttr, 0x0, sizeof(MI_DISP_InputPortAttr_t));
                 stInputPortAttr.stDispWin.u16X = 0;
@@ -1535,7 +1524,7 @@ MI_S32 ST_DisplayFlowUnInit(ST_Display_Opt_t *pstDisplayOpt)
     if(pstDisplayOpt->bUsedPanel)
     {
         SclDevId = 0;
-        SclChnId = gstSensorAttr[SENSOR_IDX_FOR_PANEL].eSensorPadID;
+        SclChnId = gstSensorAttr[g_s32SensorIdxForPanel].eSensorPadID;
         SclOutPortId =0;
         s32DispLayer = pstDisplayOpt->s32PanelLayer;
         u8DispInport = pstDisplayOpt->u8PanelInputPort;
@@ -1564,7 +1553,7 @@ MI_S32 ST_DisplayFlowUnInit(ST_Display_Opt_t *pstDisplayOpt)
             memset(&stBindInfo, 0x0, sizeof(ST_Sys_BindInfo_T));
             stBindInfo.stSrcChnPort.eModId = E_MI_MODULE_ID_SCL;
             stBindInfo.stSrcChnPort.u32DevId = 0;
-            stBindInfo.stSrcChnPort.u32ChnId = gstSensorAttr[SENSOR_IDX_FOR_PANEL].eSensorPadID;
+            stBindInfo.stSrcChnPort.u32ChnId = gstSensorAttr[g_s32SensorIdxForPanel].eSensorPadID;
             stBindInfo.stSrcChnPort.u32PortId = 0;
             stBindInfo.stDstChnPort.eModId = E_MI_MODULE_ID_SCL;
             stBindInfo.stDstChnPort.u32DevId = SclDevId;
@@ -1629,7 +1618,7 @@ MI_S32 ST_DisplayFlowUnInit(ST_Display_Opt_t *pstDisplayOpt)
             u8DispInport = 0;
             //for(u8DispInport = 0; u8DispInport < inputCnt; u8DispInport++)
             {
-                SclChnId = gstSensorAttr[SENSOR_IDX_FOR_HDMI].eSensorPadID;
+                SclChnId = gstSensorAttr[g_s32SensorIdxForHdmi].eSensorPadID;
                 memset(&stBindInfo, 0x0, sizeof(ST_Sys_BindInfo_T));
                 stBindInfo.stSrcChnPort.eModId = E_MI_MODULE_ID_SCL;
                 stBindInfo.stSrcChnPort.u32DevId = SclDevId;
@@ -1793,11 +1782,11 @@ MI_S32 ST_ResetHdmiDispFlow(ST_DispoutTiming_e eStHdmiDispTiming)
         u8DispInport = 0;
         //for(u8DispInport = 0; u8DispInport < inputCnt; u8DispInport++)
         {
-            SclChnId = gstSensorAttr[SENSOR_IDX_FOR_HDMI].eSensorPadID;
+            SclChnId = gstSensorAttr[g_s32SensorIdxForHdmi].eSensorPadID;
             memset(&stSclOutputParam, 0x0, sizeof(MI_SCL_OutPortParam_t));
             STCHECKRESULT(MI_SCL_GetOutputPortParam(SclDevId, SclChnId, SclOutPortId, &stSclOutputParam));
             STCHECKRESULT(MI_SCL_DisableOutputPort(SclDevId, SclChnId, SclOutPortId));
-            ST_GetCropParam(gstSensorAttr[SENSOR_IDX_FOR_HDMI].u16Width, gstSensorAttr[SENSOR_IDX_FOR_HDMI].u16Height, \
+            ST_GetCropParam(gstSensorAttr[g_s32SensorIdxForHdmi].u16Width, gstSensorAttr[g_s32SensorIdxForHdmi].u16Height, \
                             gstDisplayOpt.u32HdmiW, gstDisplayOpt.u32HdmiH, \
                             &stSclOutputParam.stSCLOutCropRect);
             stSclOutputParam.stSCLOutputSize.u16Width = u32DispWidth;
@@ -1838,7 +1827,11 @@ MI_S32 ST_ResetHdmiDispFlow(ST_DispoutTiming_e eStHdmiDispTiming)
     return MI_SUCCESS;
 }
 
-int SSTAR_DualSensorInit()
+#if 1//def ENABLE_FR
+    static MI_S32 g_s32Frid = -1;
+#endif
+
+int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad)
 {
     int sensorIdx, totalCnt;
     ST_Sensor_Attr_t *pstSensorAttr = NULL;
@@ -1846,6 +1839,34 @@ int SSTAR_DualSensorInit()
     MI_S32 i, s32Frid = -1;
     char *pCmd, *pArgs, argStr[256];
     int argLen = 0;
+#endif
+
+#ifndef USE_ONE_SENSOR
+    static MI_VIF_SNRPad_e eSensorPadID = gstSensorAttr[0].eSensorPadID;
+    static MI_VIF_GROUP u32VifGroupID = gstSensorAttr[0].u32VifGroupID;
+    static MI_U32 u32BindVifDev = gstSensorAttr[0].u32BindVifDev;
+    static MI_BOOL bSensor1Used = gstSensorAttr[1].bUsed;
+
+    if(bEnableFr)
+    {
+        gstSensorAttr[0].eSensorPadID = (MI_VIF_SNRPad_e)doFrPad;
+        gstSensorAttr[0].u32VifGroupID = 2 * doFrPad;
+        gstSensorAttr[0].u32BindVifDev = 8 * doFrPad;
+        gstSensorAttr[0].bDoFr = 1;
+        gstSensorAttr[1].bUsed = 0;
+        g_s32SensorIdxForPanel = 0;
+        g_s32SensorIdxForHdmi = 0;
+     }
+    else
+    {
+        gstSensorAttr[0].eSensorPadID = eSensorPadID;
+        gstSensorAttr[0].u32VifGroupID = u32VifGroupID;
+        gstSensorAttr[0].u32BindVifDev = u32BindVifDev;
+        gstSensorAttr[0].bDoFr = 0;
+        gstSensorAttr[1].bUsed = bSensor1Used;
+        g_s32SensorIdxForPanel = 1;
+        g_s32SensorIdxForHdmi = 0;
+     }
 #endif
 
     //ST_MiscInit();
@@ -1871,27 +1892,30 @@ int SSTAR_DualSensorInit()
 
     STCHECKRESULT(ST_DisplayFlowInit(&gstDisplayOpt, totalCnt));
 
-#if 0
-#ifdef ENABLE_FR
-    pstSensorAttr = NULL;
-    for(sensorIdx = 0; sensorIdx < ST_MAX_SENSOR_NUM; sensorIdx++)
+#if 1//def ENABLE_FR
+    if(bEnableFr)
     {
-        pstSensorAttr = &gstSensorAttr[sensorIdx];
-        if(0 == pstSensorAttr->bUsed)
+        pstSensorAttr = NULL;
+        for(sensorIdx = 0; sensorIdx < ST_MAX_SENSOR_NUM; sensorIdx++)
         {
-            continue;
-        }
-        if(TRUE == pstSensorAttr->bDoFr)
-        {
-            s32Frid = ST_FRStart(0/* scl device */, pstSensorAttr->eSensorPadID, \
-                    pstSensorAttr->u16Width, pstSensorAttr->u16Height, \
-                    0/* Port for RGN, 0(panel) or 1(hdmi) */, \
-                    2/* Port 2 for capture */);
-            break;
+            pstSensorAttr = &gstSensorAttr[sensorIdx];
+            if(0 == pstSensorAttr->bUsed)
+            {
+                continue;
+            }
+            if(TRUE == pstSensorAttr->bDoFr)
+            {
+            	g_s32Frid = ST_FRStart(0/* scl device */, pstSensorAttr->eSensorPadID, \
+                        pstSensorAttr->u16Width, pstSensorAttr->u16Height, \
+                        0/* Port for RGN, 0(panel) or 1(hdmi) */, \
+                        2/* Port 2 for capture */);
+                break;
+            }
         }
     }
 #endif
 
+#if 0
     while(!bExit)
     {
     #ifdef ENABLE_FR
@@ -1928,7 +1952,7 @@ int SSTAR_DualSensorInit()
         if(0 == strcasecmp(pCmd, "add"))
         {
             //Add face to db
-            ST_FRAddPerson(s32Frid, pArgs);
+            ST_FRAddPerson(g_s32Frid, pArgs);
         }
     #else
         usleep(100 * 1000);
@@ -1936,9 +1960,9 @@ int SSTAR_DualSensorInit()
     }
 
 #ifdef ENABLE_FR
-    if(s32Frid >= 0)
+    if(g_s32Frid >= 0)
     {
-        ST_FRStop(s32Frid);
+        ST_FRStop(g_s32Frid);
     }
 #endif
 #endif
@@ -1950,6 +1974,14 @@ void SSTAR_DualSensorDeinit()
 {
     int sensorIdx;
     ST_Sensor_Attr_t *pstSensorAttr = NULL;
+
+#if 1//def ENABLE_FR
+    if(g_s32Frid >= 0)
+    {
+        ST_FRStop(g_s32Frid);
+        g_s32Frid = -1;
+    }
+#endif
 
 	ST_DisplayFlowUnInit(&gstDisplayOpt);
 	ST_DispDevUnInit(&gstDisplayOpt);

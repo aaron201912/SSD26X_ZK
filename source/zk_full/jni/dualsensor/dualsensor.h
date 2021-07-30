@@ -5,7 +5,9 @@
 extern "C"{
 #endif // __cplusplus
 
-int SSTAR_DualSensorInit();
+#include "st_common.h"
+
+int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad);
 void SSTAR_DualSensorDeinit();
 
 #ifdef __cplusplus

@@ -44,7 +44,7 @@
 
 #define ALIGN_MULTI(x, align)       (((x) % (align)) ? ((x) / (align) + 1) : ((x) / (align)))
 
-#define DMF_FONT_PREFIX             "./"
+#define DMF_FONT_PREFIX             "/customer/res/font/"
 #define DMF_FONT_ASCII_8x16         "ascii_8x16"
 #define DMF_FONT_ASCII_16x32        "ascii_16x32"
 #define DMF_FONT_ASCII_24x48        "ascii_24x48"
