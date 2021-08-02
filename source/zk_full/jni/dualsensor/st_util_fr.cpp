@@ -73,6 +73,8 @@ typedef struct
     MI_U32 u32Color;
 } ST_FaceFrame_t;
 
+static MI_BOOL g_bIpuStart = FALSE;
+
 static pthread_mutex_t gStFrLock = PTHREAD_MUTEX_INITIALIZER;
 static MI_U32 gU32FrInstCnt = 0;
 static ST_FR_Instance_t gStFrInstance[MAX_FR_INSTANCE];
@@ -534,7 +536,6 @@ MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
                         MI_U16 u16SrcWidth, MI_U16 u16SrcHeight,
                         MI_SCL_PORT rgnPort, MI_SCL_PORT capPort)
 {
-    static MI_BOOL bIpuStart = FALSE;
     MI_S32 s32Ret, s32Frid = 0;
     MI_SYS_ChnPort_t stChnPort;
     MI_SCL_OutPortParam_t stOutPortParam;
@@ -548,7 +549,7 @@ MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
         return -1;
     }
 
-    if(FALSE == bIpuStart)
+    if(FALSE == g_bIpuStart)
     {
         s32Ret = XC_FaceRecognition_Init(IPU_FIRMWARE_PATH, ALG_MODEL_PATH);
         if(s32Ret != 0)
@@ -557,7 +558,7 @@ MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
             ST_FreeFrInstance(s32Frid);
             return s32Ret;
         }
-        bIpuStart = TRUE;
+        g_bIpuStart = TRUE;
     }
     printf("@@@ XC_FaceRecognition_Init OK!!!\n");
     s32Ret = XC_FaceRecognition_CreateHandle(&gStFrInstance[s32Frid].frHandle);
@@ -694,6 +695,7 @@ MI_S32 ST_FRStop(MI_S32 s32Frid)
     {
         XC_FaceRecognition_Cleanup();
     }
+    g_bIpuStart = FALSE;
 
     return MI_SUCCESS;
 }

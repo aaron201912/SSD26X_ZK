@@ -268,17 +268,11 @@ static void ST_Usage()
 }
 
 #ifdef ENABLE_FR
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
                         MI_U16 u16SrcWidth, MI_U16 u16SrcHeight,
                         MI_SCL_PORT rgnPort, MI_SCL_PORT capPort);
 extern MI_S32 ST_FRAddPerson(MI_S32 s32Frid, char *args);
 extern MI_S32 ST_FRStop(MI_S32 s32Frid);
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 static MI_S32 ST_ParserArgs(int argc, char *argv[])
@@ -1898,8 +1892,7 @@ int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad)
 
     STCHECKRESULT(ST_DisplayFlowInit(&gstDisplayOpt, totalCnt));
 
-// TODO:
-#if 0//def ENABLE_FR
+#ifdef ENABLE_FR
     if(bEnableFr)
     {
         pstSensorAttr = NULL;
@@ -1985,8 +1978,7 @@ void SSTAR_DualSensorDeinit()
 #ifdef ENABLE_FR
     if(g_s32Frid >= 0)
     {
-    	// TODO:
-        //ST_FRStop(g_s32Frid);
+    	ST_FRStop(g_s32Frid);
         g_s32Frid = -1;
     }
 #endif

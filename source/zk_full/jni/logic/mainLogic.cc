@@ -476,6 +476,11 @@ const char* IconTab[]={
 	"localMediaActivity",
 	"playPcmFileActivity",
 	"localsettingActivity",
+#ifdef ENABLE_FR
+	"facerecognitionActivity",
+#else
+	"",
+#endif
 	"glassActivity",
 	"kwsvoicedetectActivity"
 };
