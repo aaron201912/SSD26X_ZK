@@ -267,7 +267,7 @@ static void ST_Usage()
     printf("      -h: help\n");
 }
 
-#if 1//def ENABLE_FR
+#ifdef ENABLE_FR
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1833,7 +1833,7 @@ MI_S32 ST_ResetHdmiDispFlow(ST_DispoutTiming_e eStHdmiDispTiming)
     return MI_SUCCESS;
 }
 
-#if 1//def ENABLE_FR
+#ifdef ENABLE_FR
     static MI_S32 g_s32Frid = -1;
 #endif
 
@@ -1898,7 +1898,8 @@ int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad)
 
     STCHECKRESULT(ST_DisplayFlowInit(&gstDisplayOpt, totalCnt));
 
-#ifdef ENABLE_FR
+// TODO:
+#if 0//def ENABLE_FR
     if(bEnableFr)
     {
         pstSensorAttr = NULL;
@@ -1984,7 +1985,8 @@ void SSTAR_DualSensorDeinit()
 #ifdef ENABLE_FR
     if(g_s32Frid >= 0)
     {
-        ST_FRStop(g_s32Frid);
+    	// TODO:
+        //ST_FRStop(g_s32Frid);
         g_s32Frid = -1;
     }
 #endif
