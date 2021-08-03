@@ -2003,3 +2003,15 @@ void SSTAR_DualSensorDeinit()
 	//ST_MiscUnInit();
 	return;
 }
+
+#ifdef ENABLE_FR
+MI_S32 SSTAR_RegistPerson(char *name)
+{
+	if(g_s32Frid < 0 || NULL == name)
+	{
+		return -1;
+	}
+	ST_FRAddPerson(g_s32Frid, name);
+	return 0;
+}
+#endif

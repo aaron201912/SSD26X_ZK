@@ -4,11 +4,10 @@
 #include "faceregisterActivity.h"
 
 /*TAG:GlobalVariable全局变量*/
+static ZKButton* mButton_regist_facePtr;
+static ZKVideoView* mVideoView2Ptr;
 static ZKButton* msys_backPtr;
-static ZKEditText* mEdittextPhoneNumPtr;
 static ZKEditText* mEdittextUserNamePtr;
-static ZKTextView* mTextview2Ptr;
-static ZKTextView* mTextview1Ptr;
 static faceregisterActivity* mActivityPtr;
 
 /*register activity*/
@@ -46,6 +45,7 @@ typedef struct {
 
 /*TAG:ButtonCallbackTab按键映射表*/
 static S_ButtonCallback sButtonCallbackTab[] = {
+    ID_FACEREGISTER_Button_regist_face, onButtonClick_Button_regist_face,
     ID_FACEREGISTER_sys_back, onButtonClick_sys_back,
 };
 /***************/
@@ -92,7 +92,6 @@ typedef struct {
 }S_EditTextInputCallback;
 /*TAG:EditTextInputCallback*/
 static S_EditTextInputCallback SEditTextInputCallbackTab[] = {
-    ID_FACEREGISTER_EdittextPhoneNum, onEditTextChanged_EdittextPhoneNum,
     ID_FACEREGISTER_EdittextUserName, onEditTextChanged_EdittextUserName,
 };
 
@@ -105,6 +104,7 @@ typedef struct {
 }S_VideoViewCallback;
 /*TAG:VideoViewCallback*/
 static S_VideoViewCallback SVideoViewCallbackTab[] = {
+    ID_FACEREGISTER_VideoView2, true, 5, NULL,
 };
 
 
@@ -129,11 +129,10 @@ const char* faceregisterActivity::getAppName() const{
 //TAG:onCreate
 void faceregisterActivity::onCreate() {
 	Activity::onCreate();
+    mButton_regist_facePtr = (ZKButton*)findControlByID(ID_FACEREGISTER_Button_regist_face);
+    mVideoView2Ptr = (ZKVideoView*)findControlByID(ID_FACEREGISTER_VideoView2);if(mVideoView2Ptr!= NULL){mVideoView2Ptr->setVideoPlayerMessageListener(this);}
     msys_backPtr = (ZKButton*)findControlByID(ID_FACEREGISTER_sys_back);
-    mEdittextPhoneNumPtr = (ZKEditText*)findControlByID(ID_FACEREGISTER_EdittextPhoneNum);if(mEdittextPhoneNumPtr!= NULL){mEdittextPhoneNumPtr->setTextChangeListener(this);}
     mEdittextUserNamePtr = (ZKEditText*)findControlByID(ID_FACEREGISTER_EdittextUserName);if(mEdittextUserNamePtr!= NULL){mEdittextUserNamePtr->setTextChangeListener(this);}
-    mTextview2Ptr = (ZKTextView*)findControlByID(ID_FACEREGISTER_Textview2);
-    mTextview1Ptr = (ZKTextView*)findControlByID(ID_FACEREGISTER_Textview1);
 	mActivityPtr = this;
 	onUI_init();
     registerProtocolDataUpdateListener(onProtocolDataUpdate); 

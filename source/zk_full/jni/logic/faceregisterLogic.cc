@@ -29,7 +29,10 @@
 *
 * 在Eclipse编辑器中  使用 “alt + /”  快捷键可以打开智能提示
 */
+#include <string.h>
+#include "dualsensor.h"
 
+static char g_personName[128];
 
 /**
  * 注册定时器
@@ -56,6 +59,7 @@ static void onUI_intent(const Intent *intentPtr) {
     if (intentPtr != NULL) {
         //TODO
     }
+    memset(g_personName, 0, sizeof(g_personName));
 }
 
 /*
@@ -130,13 +134,20 @@ static bool onfaceregisterActivityTouchEvent(const MotionEvent &ev) {
 }
 static void onEditTextChanged_EdittextUserName(const std::string &text) {
     //LOGD(" onEditTextChanged_ EdittextUserName %s !!!\n", text.c_str());
-}
-
-static void onEditTextChanged_EdittextPhoneNum(const std::string &text) {
-    //LOGD(" onEditTextChanged_ EdittextPhoneNum %s !!!\n", text.c_str());
+	snprintf(g_personName, sizeof(g_personName), "%s", text.c_str());
 }
 
 static bool onButtonClick_sys_back(ZKButton *pButton) {
     LOGD(" ButtonClick sys_back !!!\n");
+    return false;
+}
+static bool onButtonClick_Button_regist_face(ZKButton *pButton) {
+    //LOGD(" ButtonClick Button_regist_face !!!\n");
+	if(strlen(g_personName) <= 0)
+	{
+		LOGD("Pls enter person name.\n");
+		return false;
+	}
+    SSTAR_RegistPerson(g_personName);
     return false;
 }

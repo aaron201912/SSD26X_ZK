@@ -26,11 +26,10 @@
 #include "window/ZKSlideWindow.h"
 
 /*TAG:Macro宏ID*/
+#define ID_FACEREGISTER_Button_regist_face    20001
+#define ID_FACEREGISTER_VideoView2    95001
 #define ID_FACEREGISTER_sys_back   100
-#define ID_FACEREGISTER_EdittextPhoneNum    51002
 #define ID_FACEREGISTER_EdittextUserName    51001
-#define ID_FACEREGISTER_Textview2    50002
-#define ID_FACEREGISTER_Textview1    50001
 /*TAG:Macro宏ID END*/
 
 class faceregisterActivity : public Activity, 

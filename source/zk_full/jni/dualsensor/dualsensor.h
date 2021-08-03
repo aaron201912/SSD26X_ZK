@@ -10,6 +10,9 @@ extern "C"{
 int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad);
 void SSTAR_DualSensorDeinit();
 
+#ifdef ENABLE_FR
+MI_S32 SSTAR_RegistPerson(char *name);
+#endif
 
 #ifdef __cplusplus
 }
