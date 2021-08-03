@@ -247,158 +247,17 @@ static MI_BOOL bExit = FALSE;
 
 //static pthread_t tidPollTsk;
 
-#ifdef ENABLE_FR
-const char *g_paramList = "s:S:d:D:p:P:r:R:f:F:h";
-#else
-const char *g_paramList = "s:S:d:D:p:P:r:R:h";
-#endif
-
-static void ST_Usage()
-{
-    printf("Usage: eg. prog_panel -S 2 -D 1080,60 -P mipi\n");
-    printf("Sigmastar panel demo.\n\n");
-    printf("   -S,-s: sensor count, default 2 sensor.\n");
-    //printf("   -D,-d: hdmi output, if not parameter use default 1080p@60fps. eg. 1080,60\n");
-    printf("   -P,-p: panel output, default mipi. eg. mipi ttl or none\n");
-    printf("   -R,-r: need rotation for panel display. 0/90/180/270\n");
-#ifdef ENABLE_FR
-    printf("   -F,-f: select which sensor for face recognize, default sensor pad 1\n");
-#endif
-    printf("      -h: help\n");
-}
-
-#ifdef ENABLE_FR
 extern MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
                         MI_U16 u16SrcWidth, MI_U16 u16SrcHeight,
                         MI_SCL_PORT rgnPort, MI_SCL_PORT capPort);
 extern MI_S32 ST_FRAddPerson(MI_S32 s32Frid, char *args);
 extern MI_S32 ST_FRStop(MI_S32 s32Frid);
-#endif
-
-static MI_S32 ST_ParserArgs(int argc, char *argv[])
-{
-    int i, ch = 0;
-#ifdef ENABLE_FR
-    int sensorPad;
-#endif
-    int sensorCnt, rot;
-    while(-1 != (ch = getopt(argc, argv, g_paramList)))
-    {
-        switch(ch)
-        {
-            case 's':
-            case 'S':
-            {
-                sensorCnt = atoi(optarg);
-                if(sensorCnt > 0 && sensorCnt <= 3)
-                {
-                    for(i = 0; i < sensorCnt; i++)
-                    {
-                        gstSensorAttr[i].bUsed = 1;
-                    }
-                    for(; i < ST_MAX_SENSOR_NUM; i++)
-                    {
-                        gstSensorAttr[i].bUsed = 0;
-                    }
-                }
-                else
-                {
-                    printf("Sensor parameter error.\n");
-                }
-                break;
-            }
-            case 'd':
-            case 'D':
-            {
-                break;
-            }
-            case 'p':
-            case 'P':
-            {
-                if(0 == strcasecmp(optarg, "ttl"))
-                {
-                    gstDisplayOpt.ePanelType = E_MI_PNL_INTF_TTL;
-                }
-                break;
-            }
-            case 'r':
-            case 'R':
-            {
-                rot = atoi(optarg);
-                switch(rot)
-                {
-                    case 0:
-                    case 360:
-                    {
-                        gstDisplayOpt.ePanelRot = E_MI_SYS_ROTATE_NONE;
-                        break;
-                    }
-                    case 90:
-                    {
-                        gstDisplayOpt.ePanelRot = E_MI_SYS_ROTATE_90;
-                        break;
-                    }
-                    case 180:
-                    {
-                        gstDisplayOpt.ePanelRot = E_MI_SYS_ROTATE_180;
-                        break;
-                    }
-                    case 270:
-                    {
-                        gstDisplayOpt.ePanelRot = E_MI_SYS_ROTATE_270;
-                        break;
-                    }
-                    default :
-                    {
-                        printf("Rotate parameter error.\n");
-                        break;
-                    }
-                }
-                break;
-            }
-        #ifdef ENABLE_FR
-            case 'F':
-            case 'f':
-            {
-                sensorPad = atoi(optarg);
-                if(sensorPad < E_MI_VIF_SNRPAD_ID_0 || sensorPad >= E_MI_VIF_SNRPAD_ID_MAX)
-                {
-                    printf("Sensor pad[%d] for face recognize error.\n", sensorPad);
-                    break;
-                }
-                for(i = 0; i < ST_MAX_SENSOR_NUM; i++)
-                {
-                    gstSensorAttr[i].bDoFr = (sensorPad == gstSensorAttr[i].eSensorPadID) ? 1 : 0;
-                }
-                break;
-            }
-        #endif
-            case 'h':
-            default:
-            {
-                ST_Usage();
-                return -1;
-            }
-        }
-    }
-
-    return 0;
-}
 
 static void ST_Flush(void)
 {
     char c;
 
     while((c = getchar()) != '\n' && c != EOF);
-}
-
-static void ST_Quit(int signo)
-{
-    if(SIGINT == signo)
-    {
-        printf("Get SIGINT, exit!\n");
-        bExit = 1;
-    }
 }
 
 MI_S32 ST_GetCropParam(MI_S32 srcWidth, MI_S32 srcHeight,
@@ -1827,19 +1686,12 @@ MI_S32 ST_ResetHdmiDispFlow(ST_DispoutTiming_e eStHdmiDispTiming)
     return MI_SUCCESS;
 }
 
-#ifdef ENABLE_FR
-    static MI_S32 g_s32Frid = -1;
-#endif
+static MI_S32 g_s32Frid = -1;
 
 int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad)
 {
     int sensorIdx, totalCnt;
     ST_Sensor_Attr_t *pstSensorAttr = NULL;
-#ifdef ENABLE_FR
-    MI_S32 i, s32Frid = -1;
-    char *pCmd, *pArgs, argStr[256];
-    int argLen = 0;
-#endif
 
 #ifndef USE_ONE_SENSOR
     static MI_VIF_SNRPad_e eSensorPadID = gstSensorAttr[0].eSensorPadID;
@@ -1892,7 +1744,6 @@ int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad)
 
     STCHECKRESULT(ST_DisplayFlowInit(&gstDisplayOpt, totalCnt));
 
-#ifdef ENABLE_FR
     if(bEnableFr)
     {
         pstSensorAttr = NULL;
@@ -1909,63 +1760,14 @@ int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad)
                         pstSensorAttr->u16Width, pstSensorAttr->u16Height, \
                         0/* Port for RGN, 0(panel) or 1(hdmi) */, \
                         2/* Port 2 for capture */);
+            	if(g_s32Frid < 0)
+            	{
+            		printf("ST_FRStart fail, ret = %d\n", g_s32Frid);
+            	}
                 break;
             }
         }
     }
-#endif
-
-#if 0
-    while(!bExit)
-    {
-    #ifdef ENABLE_FR
-        printf(">");
-        fflush(stdout);
-        memset(argStr, 0, sizeof(argStr));
-        argLen = read(0, argStr, sizeof(argStr) - 1);
-        if(argLen <= 1)
-        {
-            continue;
-        }
-        else if(2 == argLen)
-        {
-            if('q' == argStr[0] || 'Q' == argStr[0])
-            {
-                break;
-            }
-        }
-        pCmd = argStr;
-        if(NULL == (pArgs = strchr(argStr, ' ')))
-        {
-            continue;
-        }
-        *pArgs = '\0';
-        pArgs++;
-        i = strlen(pArgs) - 1;
-        for(i = strlen(pArgs) - 1; i >= 0; i--)
-        {
-            if(ASCII_CR == pArgs[i] || ASCII_LF == pArgs[i])
-            {
-                pArgs[i] = 0;
-            }
-        }
-        if(0 == strcasecmp(pCmd, "add"))
-        {
-            //Add face to db
-            ST_FRAddPerson(g_s32Frid, pArgs);
-        }
-    #else
-        usleep(100 * 1000);
-    #endif
-    }
-
-#ifdef ENABLE_FR
-    if(g_s32Frid >= 0)
-    {
-        ST_FRStop(g_s32Frid);
-    }
-#endif
-#endif
 
     return 0;
 }
@@ -1975,13 +1777,11 @@ void SSTAR_DualSensorDeinit()
     int sensorIdx;
     ST_Sensor_Attr_t *pstSensorAttr = NULL;
 
-#ifdef ENABLE_FR
     if(g_s32Frid >= 0)
     {
     	ST_FRStop(g_s32Frid);
-        g_s32Frid = -1;
     }
-#endif
+    g_s32Frid = -1;
 
 	ST_DisplayFlowUnInit(&gstDisplayOpt);
 	ST_DispDevUnInit(&gstDisplayOpt);
@@ -2004,7 +1804,6 @@ void SSTAR_DualSensorDeinit()
 	return;
 }
 
-#ifdef ENABLE_FR
 MI_S32 SSTAR_RegistPerson(char *name)
 {
 	if(g_s32Frid < 0 || NULL == name)
@@ -2014,4 +1813,3 @@ MI_S32 SSTAR_RegistPerson(char *name)
 	ST_FRAddPerson(g_s32Frid, name);
 	return 0;
 }
-#endif

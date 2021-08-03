@@ -46,6 +46,10 @@
 #define BACKLIGHT_GPIO	62	// 7
 #define POWERCTRL_GPIO	63	// 8
 
+extern int ST_FRInit();
+
+static int g_isSupportFr = -1;
+
 static int g_curPageIdx = 0;
 /**
  * 注册定时器
@@ -410,6 +414,8 @@ static void onUI_init(){
 	MI_GFX_Open(0);
 	ShowStatusBar(1, 0, 0);
 
+	g_isSupportFr = ST_FRInit();
+
 	printf("begin to clear disp inputport buf\n");
 	MI_DISP_EnableInputPort(0, 0);
 	MI_DISP_ClearInputPortBuffer(0, 0, TRUE);
@@ -476,11 +482,7 @@ const char* IconTab[]={
 	"localMediaActivity",
 	"playPcmFileActivity",
 	"localsettingActivity",
-#ifdef ENABLE_FR
 	"facerecognitionActivity",
-#else
-	"",
-#endif
 	"glassActivity",
 	"kwsvoicedetectActivity"
 };
@@ -488,6 +490,10 @@ const char* IconTab[]={
 static void onSlideItemClick_Slidewindow1(ZKSlideWindow *pSlideWindow, int index) {
 	ShowStatusBar(0, 1 ,1);
 	printf("select idx is %d\n", index);
+	if(0 != g_isSupportFr && 0 == strcmp(IconTab[index], "facerecognitionActivity"))
+	{
+		return;
+	}
 	EASYUICONTEXT->openActivity(IconTab[index]);
 }
 

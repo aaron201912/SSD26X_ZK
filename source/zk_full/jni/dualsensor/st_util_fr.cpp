@@ -1,4 +1,3 @@
-#ifdef ENABLE_FR
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -7,6 +6,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <sys/syscall.h>
+#include <dlfcn.h>
 
 #include <string>
 
@@ -30,6 +30,7 @@
 
 #define IPU_FIRMWARE_PATH "/config/dla/ipu_firmware.bin"
 #define ALG_MODEL_PATH "/customer/res/model/"
+#define FR_SDK_LIB_PATH "/customer/lib/libFrSdk.so"
 
 #define FACE_DB_FEAT_FILE_PATH "/customer/res/feat.bin"
 #define FACE_DB_NAME_LIST_PATH "/customer/res/name.list"
@@ -69,6 +70,103 @@ typedef struct
     MI_U32 u32BorderLen;
     MI_U32 u32Color;
 } ST_FaceFrame_t;
+
+struct
+{
+	void *pHandle;
+
+	/*************************************************
+	*功能           初始化sdk环境
+	*ipu_firwarepath  输入：ipu_firware.bin 的路径
+	*modelpath        输入：模型存放的路劲
+	*************************************************/
+	int (*pfnXC_FaceRecognition_Init)(const char* ipu_firmwarepath,const char* modelpath);
+
+	/*************************************************
+	*功能           创建句柄
+	*detectorID       输入：句柄指针
+	*************************************************/
+	int (*pfnXC_FaceRecognition_CreateHandle)(long long* detectorID);
+
+	/*************************************************
+	*功能           人脸检测接口（根据参数）
+	*detectorID      输入：句柄指针
+	*imagedata       输入：图像的数据（只支持BGRA）
+	*width           输入：图像的宽 320
+	*height          输入：图像的高 256
+	*channel         输入：图像的通道（BGRA）
+	*ParamSDK        输入：配置参数
+	*DetectBox       输出：输出的人脸框
+	*facecount       输出：人脸框个数
+	*************************************************/
+	int (*pfnXC_FaceRecognition_Detect)(long long detectID,const char* imagedata,const int width,const int height, const int channel, const ParamSDK* params, DetectBox** detectout,int* facecount);
+
+	/*************************************************
+     *功能           人脸检测接口（根据参数）
+     *detectorID      输入：句柄指针
+     *imagedata       输入：图像的数据（只支持BGRA）
+     *width           输入：图像的宽 112
+     *height          输入：图像的高 112
+     *channel         输入：图像的通道（默认为BGRA 4通道）
+     *DetectBox       输出：检测的人脸框
+     *************************************************/
+    int (*pfnXC_FaceLandmark_Detect)(long long detectID, const char* imagedata, const int width, const int height,const int channel, DetectBox* detectbox);
+
+	/*************************************************
+	*功能           将BGRA的数据crop出112x112的BGRA的数据
+	*imagedata       输入：BGRA的数据指针
+	*width           输入：图像的宽
+	*height          输入：图像的高
+	*channel		 输入：图像的通道
+	*detectout       输入：检测框和关键点
+	*outmatdata      输出：对齐后的BGRA图像
+	*************************************************/
+	int (*pfnXC_Crop112x112_BGRA)(unsigned char* imagedata,int width,int height,int channel, DetectBox detectout,unsigned char* outmatdata);
+
+	/*************************************************
+	*功能           活体检测（暂未实现）
+	*detectorID      输入：句柄
+	*imagedata       输入：图像buffer数据
+	*width           输入：图像的宽
+	*height          输入：图像的高
+	* channel        输入：图像的通道数
+	*detectRect      输入：检测框和关键点
+	*spoofing        输出：是否是活体
+	*************************************************/
+	int (*pfnXC_FaceRecognition_Antispoofing)(long long detectID,const char* imagedata, const int width, const int height, const int channel, DetectBox detectRect,int* spoofing);
+
+	/*************************************************
+	*功能           人脸特征提取
+	*detectorID      输入：句柄
+	*imagedata       输入：BGR图像数据
+	*width           输入：图像的宽
+	*height          输入：图像的高
+	*channel         输入：图像的通道数
+	*detectRect      输入：检测框和关键点
+	*featureout      输出：人脸特征
+	*************************************************/
+	int (*pfnXC_FaceRecegnition_FeatureExtract)(long long detectID, const char* imagedata, const int width, const int height, const int channel, DetectBox detectRect, int16_t* featureout);
+
+	/*************************************************
+	*功能           人脸特征比对
+	*feature1        输入：第一个人脸特征
+	*feature2        输入：第二个人脸特征
+	*length          输入：人脸特征长度（130）
+	*simility        输出：人脸相似度
+	*************************************************/
+	int (*pfnXC_FaceRecognition_FeatureCompare)(const int16_t* feature1,const int16_t* feature2,int length, float* simility);
+
+	/*************************************************
+	*功能           释放句柄
+	*detectorID      输入：句柄
+	*************************************************/
+	int (*pfnXC_FaceRecognition_ReleaseHandle)(long long detectorID);
+
+	/*************************************************
+	*功能           清理人脸sdk的运行环境
+	*************************************************/
+	int (*pfnXC_FaceRecognition_Cleanup)();
+} g_st_XC_FaceRecognition;
 
 static MI_BOOL g_bIpuStart = FALSE;
 
@@ -244,7 +342,7 @@ static MI_S32 ST_FRFindName(FaceDatabase &face_db, int16_t * feat, char *name, i
         for(int j = 0; j < feat_num; j++)
         {
             float score = 0;
-            XC_FaceRecognition_FeatureCompare((int16_t *)feat, (int16_t*)face_db.persons[i].features[j].pData,
+            g_st_XC_FaceRecognition.pfnXC_FaceRecognition_FeatureCompare((int16_t *)feat, (int16_t*)face_db.persons[i].features[j].pData,
                                               FEATURE_SIZE, &score);
             if (score > score_max)
             {
@@ -390,7 +488,7 @@ static void *ST_FrTask(void * arg)
                         break;
                     }
 
-                    s32Ret = XC_FaceRecognition_Detect(pstFrInstance->frHandle, (const char*)pstFrInstance->pFdBufVirAddr, \
+                    s32Ret = g_st_XC_FaceRecognition.pfnXC_FaceRecognition_Detect(pstFrInstance->frHandle, (const char*)pstFrInstance->pFdBufVirAddr, \
                                                         stDstBuf.u32Width, stDstBuf.u32Height, 4, \
                                                         &frParams, &outputbox, &facecount);
                     if(FR_SCECCSS != s32Ret || facecount <= 0)
@@ -459,7 +557,7 @@ static void *ST_FrTask(void * arg)
                                 ST_ERR("MI_SCL_StretchBuf failed!\n");
                                 break;
                             }
-                            XC_FaceLandmark_Detect(pstFrInstance->frHandle, (const char*)pstFrInstance->pFdBufVirAddr, \
+                            g_st_XC_FaceRecognition.pfnXC_FaceLandmark_Detect(pstFrInstance->frHandle, (const char*)pstFrInstance->pFdBufVirAddr, \
                                                         stDstBuf.u32Width, stDstBuf.u32Height, 4, &landmarkbox);
                         #ifdef DBG_SAVE_FR_FILE
                             int j = 0;
@@ -478,11 +576,11 @@ static void *ST_FrTask(void * arg)
                             snprintf(frDbgFile, sizeof(frDbgFile), "/tmp/fr_dbg_%d_%d.argb", stSrcBuf.u32Width, stSrcBuf.u32Height);
                             ST_SaveFile(frDbgFile, (unsigned char*)stBufInfo.stFrameData.pVirAddr[0], stSrcBuf.u32Width * stSrcBuf.u32Height * 4);
                         #endif
-                            XC_Crop112x112_BGRA((unsigned char*)stBufInfo.stFrameData.pVirAddr[0], stSrcBuf.u32Width, stSrcBuf.u32Height, 4, landmarkbox, outmatdata);
+                            g_st_XC_FaceRecognition.pfnXC_Crop112x112_BGRA((unsigned char*)stBufInfo.stFrameData.pVirAddr[0], stSrcBuf.u32Width, stSrcBuf.u32Height, 4, landmarkbox, outmatdata);
                         #ifdef DBG_SAVE_FR_FILE
                             ST_SaveFile("/tmp/fr_dbg_112_112.argb", outmatdata, sizeof(outmatdata));
                         #endif
-                            s32Ret = XC_FaceRecegnition_FeatureExtract(pstFrInstance->frHandle, (const char *)outmatdata, 112, 112, 4, tofeature, feature);
+                            s32Ret = g_st_XC_FaceRecognition.pfnXC_FaceRecegnition_FeatureExtract(pstFrInstance->frHandle, (const char *)outmatdata, 112, 112, 4, tofeature, feature);
                             if(s32Ret != 0)
                             {
                                 printf("FR invoke error:%d\n", s32Ret);
@@ -529,6 +627,54 @@ static void *ST_FrTask(void * arg)
     return NULL;
 }
 
+#define ST_FR_DLSYM_DO(handle, name, pfunc) \
+do \
+{ \
+    (pfunc) = (typeof(pfunc))dlsym((handle), (name)); \
+    if(NULL == (pfunc)) \
+    { \
+        printf("[%s:%d] dlsym failed, %s\n", __func__, __LINE__, dlerror()); \
+        goto errExit; \
+    } \
+}while(0);
+
+int ST_FRInit()
+{
+    if(0 != access(IPU_FIRMWARE_PATH, F_OK) || \
+        0 != access(ALG_MODEL_PATH, F_OK) || \
+        0 != access(FR_SDK_LIB_PATH, F_OK))
+    {
+        return -1;
+    }
+
+    g_st_XC_FaceRecognition.pHandle = dlopen(FR_SDK_LIB_PATH, RTLD_NOW);
+    if (NULL == g_st_XC_FaceRecognition.pHandle)
+    {
+        printf(" %s: Can not load %s!\n", __func__, FR_SDK_LIB_PATH);
+        return -1;
+    }
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_FaceRecognition_Init", g_st_XC_FaceRecognition.pfnXC_FaceRecognition_Init);
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_FaceRecognition_CreateHandle", g_st_XC_FaceRecognition.pfnXC_FaceRecognition_CreateHandle);
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_FaceRecognition_Detect", g_st_XC_FaceRecognition.pfnXC_FaceRecognition_Detect);
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_FaceLandmark_Detect", g_st_XC_FaceRecognition.pfnXC_FaceLandmark_Detect);
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_Crop112x112_BGRA", g_st_XC_FaceRecognition.pfnXC_Crop112x112_BGRA);
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_FaceRecognition_Antispoofing", g_st_XC_FaceRecognition.pfnXC_FaceRecognition_Antispoofing);
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_FaceRecegnition_FeatureExtract", g_st_XC_FaceRecognition.pfnXC_FaceRecegnition_FeatureExtract);
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_FaceRecognition_FeatureCompare", g_st_XC_FaceRecognition.pfnXC_FaceRecognition_FeatureCompare);
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_FaceRecognition_ReleaseHandle", g_st_XC_FaceRecognition.pfnXC_FaceRecognition_ReleaseHandle);
+    ST_FR_DLSYM_DO(g_st_XC_FaceRecognition.pHandle, "XC_FaceRecognition_Cleanup", g_st_XC_FaceRecognition.pfnXC_FaceRecognition_Cleanup);
+
+    return 0;
+
+errExit:
+    if(NULL != g_st_XC_FaceRecognition.pHandle)
+    {
+        dlclose(g_st_XC_FaceRecognition.pHandle);
+        g_st_XC_FaceRecognition.pHandle = NULL;
+    }
+    return -1;
+}
+
 MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
                         MI_U16 u16SrcWidth, MI_U16 u16SrcHeight,
                         MI_SCL_PORT rgnPort, MI_SCL_PORT capPort)
@@ -540,6 +686,12 @@ MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
     MI_RGN_ChnPort_t stRgnChnPort;
     MI_RGN_ChnPortParam_t stRgnChnPortParam;
 
+    if(NULL == g_st_XC_FaceRecognition.pHandle)
+    {
+    	printf("Not support face recognition or g_st_XC_FaceRecognition do not be init yet.\n");
+        return -1;
+    }
+
     s32Frid = ST_GetFrInstance();
     if(s32Frid < 0)
     {
@@ -548,7 +700,7 @@ MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
 
     if(FALSE == g_bIpuStart)
     {
-        s32Ret = XC_FaceRecognition_Init(IPU_FIRMWARE_PATH, ALG_MODEL_PATH);
+        s32Ret = g_st_XC_FaceRecognition.pfnXC_FaceRecognition_Init(IPU_FIRMWARE_PATH, ALG_MODEL_PATH);
         if(s32Ret != 0)
         {
             ST_ERR("XC_FaceRecognition init fail, s32Ret = %d\n", s32Ret);
@@ -558,12 +710,12 @@ MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
         g_bIpuStart = TRUE;
     }
     printf("@@@ XC_FaceRecognition_Init OK!!!\n");
-    s32Ret = XC_FaceRecognition_CreateHandle(&gStFrInstance[s32Frid].frHandle);
+    s32Ret = g_st_XC_FaceRecognition.pfnXC_FaceRecognition_CreateHandle(&gStFrInstance[s32Frid].frHandle);
     if(0 != s32Ret)
     {
         ST_ERR("XC_FaceRecognition_CreateHandle err:%x\n", s32Ret);
         ST_FreeFrInstance(s32Frid);
-        XC_FaceRecognition_Cleanup();
+        g_st_XC_FaceRecognition.pfnXC_FaceRecognition_Cleanup();
         return s32Ret;
     }
 
@@ -628,6 +780,12 @@ MI_S32 ST_FRAddPerson(MI_S32 s32Frid, char *args)
 {
     char *pName = NULL, *pPicPath = NULL;
 
+    if(NULL == g_st_XC_FaceRecognition.pHandle)
+    {
+    	printf("Not support face recognition or g_st_XC_FaceRecognition do not be init yet.\n");
+        return -1;
+    }
+
     if(s32Frid < 0 || s32Frid > MAX_FR_INSTANCE || NULL == args)
     {
         return -1;
@@ -664,6 +822,12 @@ MI_S32 ST_FRStop(MI_S32 s32Frid)
 {
     MI_RGN_ChnPort_t stRgnChnPort;
 
+    if(NULL == g_st_XC_FaceRecognition.pHandle)
+    {
+    	printf("Not support face recognition or g_st_XC_FaceRecognition do not be init yet.\n");
+        return -1;
+    }
+
     pthread_mutex_lock(&gStFrLock);
     if(!gStFrInstance[s32Frid].bUsed)
     {
@@ -687,14 +851,12 @@ MI_S32 ST_FRStop(MI_S32 s32Frid)
     ST_OSD_Destroy(gStFrInstance[s32Frid].rgnHandle);
     ST_OSD_Deinit();
 
-    XC_FaceRecognition_ReleaseHandle(gStFrInstance[s32Frid].frHandle);
+    g_st_XC_FaceRecognition.pfnXC_FaceRecognition_ReleaseHandle(gStFrInstance[s32Frid].frHandle);
     if(0 == ST_FreeFrInstance(s32Frid))
     {
-        XC_FaceRecognition_Cleanup();
+        g_st_XC_FaceRecognition.pfnXC_FaceRecognition_Cleanup();
     }
     g_bIpuStart = FALSE;
 
     return MI_SUCCESS;
 }
-#endif
-
