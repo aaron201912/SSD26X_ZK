@@ -27,7 +27,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	/************************************************
+	/*************************************************
 	*功能           初始化sdk环境
 	*ipu_firwarepath  输入：ipu_firware.bin 的路径
 	*modelpath        输入：模型存放的路劲
@@ -72,7 +72,7 @@ extern "C" {
 	*detectout       输入：检测框和关键点
 	*outmatdata      输出：对齐后的BGRA图像
 	*************************************************/
-	SVTCLIENT_API(int) XC_Crop112x112_BGRA(unsigned char* imagedata,int width,int height,int channel, DetectBox detectout,cv::Mat & outmatdata); 
+	SVTCLIENT_API(int) XC_Crop112x112_BGRA(unsigned char* imagedata,int width,int height,int channel, DetectBox detectout,unsigned char* outmatdata); 
 	
 	/*************************************************
 	*功能           活体检测（暂未实现）

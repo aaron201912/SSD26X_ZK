@@ -26,6 +26,7 @@
 #include "window/ZKSlideWindow.h"
 
 /*TAG:Macro宏ID*/
+#define ID_FACERECOGNITION_face_register    20001
 #define ID_FACERECOGNITION_sys_back   100
 #define ID_FACERECOGNITION_Videoview1    95001
 /*TAG:Macro宏ID END*/

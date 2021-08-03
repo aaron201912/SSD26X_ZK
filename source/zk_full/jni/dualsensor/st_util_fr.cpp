@@ -8,14 +8,11 @@
 #include <pthread.h>
 #include <sys/syscall.h>
 
+#include <string>
+
 #include "st_common.h"
 #include "st_rgn.h"
 #include "mi_scl.h"
-
-#include "opencv2/opencv.hpp"
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 
 #include "common_struct.h"
 #include "FaceData.h"
@@ -306,6 +303,7 @@ static void *ST_FrTask(void * arg)
 #ifdef DBG_SAVE_FR_FILE
     char frDbgFile[128] = {0};
 #endif
+    unsigned char outmatdata[112 * 112 * 4] = {0};
 
     if(0 == access(FACE_DB_FEAT_FILE_PATH, F_OK) &&\
         0 == access(FACE_DB_NAME_LIST_PATH, F_OK))
@@ -472,7 +470,6 @@ static void *ST_FrTask(void * arg)
                             ST_SaveFile("/tmp/fr_lm_dbg_112_112.argb", pstFrInstance->pFdBufVirAddr, stDstBuf.u32Width * stDstBuf.u32Height * 4);
                         #endif
 
-                            cv::Mat crop(112, 112, CV_8UC4);
                             if(tofeature.Befiltered)
                             {
                                 continue;
@@ -481,11 +478,11 @@ static void *ST_FrTask(void * arg)
                             snprintf(frDbgFile, sizeof(frDbgFile), "/tmp/fr_dbg_%d_%d.argb", stSrcBuf.u32Width, stSrcBuf.u32Height);
                             ST_SaveFile(frDbgFile, (unsigned char*)stBufInfo.stFrameData.pVirAddr[0], stSrcBuf.u32Width * stSrcBuf.u32Height * 4);
                         #endif
-                            XC_Crop112x112_BGRA((unsigned char*)stBufInfo.stFrameData.pVirAddr[0], stSrcBuf.u32Width, stSrcBuf.u32Height, 4, landmarkbox, crop);
+                            XC_Crop112x112_BGRA((unsigned char*)stBufInfo.stFrameData.pVirAddr[0], stSrcBuf.u32Width, stSrcBuf.u32Height, 4, landmarkbox, outmatdata);
                         #ifdef DBG_SAVE_FR_FILE
-                            ST_SaveFile("/tmp/fr_dbg_112_112.argb", crop.data, crop.cols * crop.rows * 4);
+                            ST_SaveFile("/tmp/fr_dbg_112_112.argb", outmatdata, sizeof(outmatdata));
                         #endif
-                            s32Ret = XC_FaceRecegnition_FeatureExtract(pstFrInstance->frHandle, (const char*)crop.data, crop.cols, crop.rows, crop.channels(), tofeature, feature);
+                            s32Ret = XC_FaceRecegnition_FeatureExtract(pstFrInstance->frHandle, (const char *)outmatdata, 112, 112, 4, tofeature, feature);
                             if(s32Ret != 0)
                             {
                                 printf("FR invoke error:%d\n", s32Ret);

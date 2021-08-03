@@ -70,21 +70,10 @@ INCLUDE_DIR += -I ../jni/hotplugdetect -I ../jni/hotplugdetect/common -I ../jni/
 
 #LDFLAGS += -DENABLE_FR
 ifneq ($(findstring ENABLE_FR,$(LDFLAGS)), )
-INCLUDE_DIR += -I../jni/internal/opencv/include/opencv4
 LDFLAGS += -lmi_rgn -lpthread
 LDFLAGS += -lmi_ipu -lcam_fs_wrapper -lcam_os_wrapper
 
 LDFLAGS += -L../jni/sdkdir -lFrSdk
-
-#static library path
-#LIBS += -L$(DB_BUILD_TOP)/internal/opencv/static_lib_${TOOLCHAIN_VERSION} -L$(DB_BUILD_TOP)/internal/opencv/static_lib_${TOOLCHAIN_VERSION}/opencv4/3rdparty
-#static library
-#LIBS += -lopencv_imgcodecs -lopencv_imgproc -lopencv_core -littnotify -llibjasper -llibjpeg-turbo -llibpng -llibtiff -llibwebp -ltegra_hal -lzlib
-
-#shared library path
-LDFLAGS += -L../jni/internal/opencv/shared_lib_9.1.0
-#shared opencv library
-LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_imgcodecs
 endif
 
 TARGET=../libs/armeabi/libzkgui.so

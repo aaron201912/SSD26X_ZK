@@ -136,3 +136,8 @@ static bool onButtonClick_sys_back(ZKButton *pButton) {
     LOGD(" ButtonClick sys_back !!!\n");
     return false;
 }
+
+static bool onButtonClick_face_register(ZKButton *pButton) {
+    EASYUICONTEXT->openActivity("faceregisterActivity");
+    return false;
+}

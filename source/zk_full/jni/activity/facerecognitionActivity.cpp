@@ -4,6 +4,7 @@
 #include "facerecognitionActivity.h"
 
 /*TAG:GlobalVariable全局变量*/
+static ZKButton* mface_registerPtr;
 static ZKButton* msys_backPtr;
 static ZKVideoView* mVideoview1Ptr;
 static facerecognitionActivity* mActivityPtr;
@@ -43,6 +44,7 @@ typedef struct {
 
 /*TAG:ButtonCallbackTab按键映射表*/
 static S_ButtonCallback sButtonCallbackTab[] = {
+    ID_FACERECOGNITION_face_register, onButtonClick_face_register,
     ID_FACERECOGNITION_sys_back, onButtonClick_sys_back,
 };
 /***************/
@@ -125,6 +127,7 @@ const char* facerecognitionActivity::getAppName() const{
 //TAG:onCreate
 void facerecognitionActivity::onCreate() {
 	Activity::onCreate();
+    mface_registerPtr = (ZKButton*)findControlByID(ID_FACERECOGNITION_face_register);
     msys_backPtr = (ZKButton*)findControlByID(ID_FACERECOGNITION_sys_back);
     mVideoview1Ptr = (ZKVideoView*)findControlByID(ID_FACERECOGNITION_Videoview1);if(mVideoview1Ptr!= NULL){mVideoview1Ptr->setVideoPlayerMessageListener(this);}
 	mActivityPtr = this;
