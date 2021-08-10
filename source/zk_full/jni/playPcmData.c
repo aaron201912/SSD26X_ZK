@@ -204,9 +204,9 @@ void SSTAR_LocalCameraDisp(MI_S32 s32Disp)
             SSTAR_StartPlayAudioFile("8K_16bit_MONO.wav", 2);
             ST_DBG("open current dir wav file\n");
         }
-        else if ((access("/customer/res/8K_16bit_MONO.wav", F_OK))!=-1)
+        else if ((access("/customer/res/media/8K_16bit_MONO.wav", F_OK))!=-1)
         {
-            SSTAR_StartPlayAudioFile("/customer/res/8K_16bit_MONO.wav", 2);
+            SSTAR_StartPlayAudioFile("/customer/res/media/8K_16bit_MONO.wav", 2);
             ST_DBG("open /custome dir wav file\n");
         }
         else if ((access("/config/8K_16bit_MONO.wav", F_OK))!=-1)
@@ -225,7 +225,7 @@ void SSTAR_LocalCameraDisp(MI_S32 s32Disp)
             SSTAR_StopPlayAudioFile();
             ST_DBG("open current dir wav file\n");
         }
-        else if ((access("/customer/res/8K_16bit_MONO.wav", F_OK))!=-1)
+        else if ((access("/customer/res/media/8K_16bit_MONO.wav", F_OK))!=-1)
         {
             SSTAR_StopPlayAudioFile();
             ST_DBG("open /customer dir wav file\n");
