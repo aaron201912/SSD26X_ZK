@@ -3,7 +3,7 @@
     <string name="hello_world">你好,世界!</string>
     <string name="icon_text">文本/图片</string>
     <string name="icon_progress">进度条</string>
-    <string name="icon_button">按键键</string>
+    <string name="icon_button">按键</string>
     <string name="icon_edittext">输入框</string>
     <string name="icon_list">列表</string>
     <string name="icon_qrcode">二维码</string>
