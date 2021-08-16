@@ -53,7 +53,8 @@ INCLUDE_DIR :=  -I$(EASYUI_COMMON_INCLUDE) \
                 -I ../jni/internal/hdmi \
                 -I ../jni/internal/rgn \
                 -I ../jni/dualsensor \
-                -I ../jni/aed_kws_detect  
+                -I ../jni/aed_kws_detect \
+                -I ../jni/util 
 
 LDFLAGS = -leasyui -lpthread -lmi_common -lmi_sys -lmi_sensor -lmi_vif -lmi_isp -lmi_scl -lmi_venc \
         -lmi_disp -lmi_hdmi -lmi_panel -lmi_vdec -lmi_rgn -lmi_iqserver -lmi_gfx  -lmi_ai -lmi_ao \

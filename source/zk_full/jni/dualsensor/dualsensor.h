@@ -7,6 +7,8 @@ extern "C"{
 
 #include "st_common.h"
 
+int ST_SensorParamInit(void);
+
 int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad);
 void SSTAR_DualSensorDeinit();
 

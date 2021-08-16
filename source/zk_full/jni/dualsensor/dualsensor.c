@@ -8,6 +8,8 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <sys/syscall.h>
+#include <errno.h>
+#include <unistd.h>
 
 #include "mi_sensor.h"
 #include "mi_sensor_datatype.h"
@@ -25,6 +27,7 @@
 #include "st_disp.h"
 
 #include "dualsensor.h"
+#include "cJSON.h"
 
 #define  ASCII_CR       0x0d
 #define  ASCII_LF       0x0a
@@ -206,7 +209,7 @@ static ST_Sensor_Attr_t gstSensorAttr[ST_MAX_SENSOR_NUM] =
         .bUsed = 0,
         .bDoFr = 0,
         .eSensorPadID = E_MI_VIF_SNRPAD_ID_2,
-        .u32VifGroupID = 1,
+        .u32VifGroupID = 3,
         .u32BindVifDev = 4,
         .bPlaneMode = 1,
         .u8ResIndex = 0xff,
@@ -252,6 +255,175 @@ extern MI_S32 ST_FRStart(MI_SCL_DEV sclDev, MI_SCL_CHANNEL sclChn,
                         MI_SCL_PORT rgnPort, MI_SCL_PORT capPort);
 extern MI_S32 ST_FRAddPerson(MI_S32 s32Frid, char *args);
 extern MI_S32 ST_FRStop(MI_S32 s32Frid);
+
+const char *g_DualSensorParmFile = "/customer/dualsensorParm.json";
+int ST_SensorParamInit(void)
+{
+	MI_S32 S32ParmReadFd = -1;
+	char u8ReadFdBuf[1024] = {0};
+	cJSON *xpRoot = NULL;
+	cJSON *xpSubobj = NULL;
+	cJSON *xpItem = NULL;
+
+	S32ParmReadFd = open(g_DualSensorParmFile, O_RDONLY);
+	if(S32ParmReadFd <= 0)
+	{
+		printf("Open input file failed:%s \n", g_DualSensorParmFile);
+		printf("error:%s \n", strerror(errno));
+		return -1;
+	}
+	printf("Open input file successful:%s \n", g_DualSensorParmFile);
+	if(read(S32ParmReadFd, u8ReadFdBuf, sizeof(u8ReadFdBuf)) <= 0)
+	{
+		printf("Read input file failed:%s \n", g_DualSensorParmFile);
+		printf("error:%s \n", strerror(errno));
+		return -1;
+	}
+	printf("Read input file successful:%s \n", g_DualSensorParmFile);
+
+	xpRoot = cJSON_Parse(u8ReadFdBuf);
+	cJSON_Print(xpRoot);
+	xpSubobj = cJSON_GetObjectItem(xpRoot, "sensor0");
+	if(xpSubobj)
+	{
+		xpItem = cJSON_GetObjectItem(xpSubobj, "used");
+		if(xpItem)
+		{
+			if(xpItem->type == cJSON_True)
+			{
+				gstSensorAttr[0].bUsed = TRUE;
+			}
+			else
+			{
+				gstSensorAttr[0].bUsed = FALSE;
+			}
+			printf("sensor0->used = %d \n", gstSensorAttr[0].bUsed);
+		}
+		xpItem = cJSON_GetObjectItem(xpSubobj, "pad_id");
+		if(xpItem)
+		{
+			gstSensorAttr[0].eSensorPadID = (MI_VIF_SNRPad_e)xpItem->valueint;
+			printf("sensor0->pad_id = %d \n", gstSensorAttr[0].eSensorPadID);
+		}
+		xpItem = cJSON_GetObjectItem(xpSubobj, "vif_group");
+		if(xpItem)
+		{
+			gstSensorAttr[0].u32VifGroupID = xpItem->valueint;
+			printf("sensor0->vif_group = %d \n", gstSensorAttr[0].u32VifGroupID);
+		}
+		xpItem = cJSON_GetObjectItem(xpSubobj, "vif_dev");
+		if(xpItem)
+		{
+			gstSensorAttr[0].u32BindVifDev = xpItem->valueint;
+			printf("sensor0->vif_dev = %d \n", gstSensorAttr[0].u32BindVifDev);
+		}
+	}
+	xpSubobj = cJSON_GetObjectItem(xpRoot, "sensor1");
+	if(xpSubobj)
+	{
+		xpItem = cJSON_GetObjectItem(xpSubobj, "used");
+		if(xpItem)
+		{
+			if(xpItem->type == cJSON_True)
+			{
+				gstSensorAttr[1].bUsed = TRUE;
+			}
+			else
+			{
+				gstSensorAttr[1].bUsed = FALSE;
+			}
+			printf("sensor1->used = %d \n", gstSensorAttr[1].bUsed);
+		}
+		xpItem = cJSON_GetObjectItem(xpSubobj, "pad_id");
+		if(xpItem)
+		{
+			gstSensorAttr[1].eSensorPadID = (MI_VIF_SNRPad_e)xpItem->valueint;
+			printf("sensor1->pad_id = %d \n", gstSensorAttr[1].eSensorPadID);
+		}
+		xpItem = cJSON_GetObjectItem(xpSubobj, "vif_group");
+		if(xpItem)
+		{
+			gstSensorAttr[1].u32VifGroupID = xpItem->valueint;
+			printf("sensor1->vif_group = %d \n", gstSensorAttr[1].u32VifGroupID);
+		}
+		xpItem = cJSON_GetObjectItem(xpSubobj, "vif_dev");
+		if(xpItem)
+		{
+			gstSensorAttr[1].u32BindVifDev = xpItem->valueint;
+			printf("sensor1->vif_dev = %d \n", gstSensorAttr[1].u32BindVifDev);
+		}
+	}
+	xpSubobj = cJSON_GetObjectItem(xpRoot, "sensor2");
+	if(xpSubobj)
+	{
+		xpItem = cJSON_GetObjectItem(xpSubobj, "used");
+		if(xpItem)
+		{
+			if(xpItem->type == cJSON_True)
+			{
+				gstSensorAttr[2].bUsed = TRUE;
+			}
+			else
+			{
+				gstSensorAttr[2].bUsed = FALSE;
+			}
+			printf("sensor2->used = %d \n", gstSensorAttr[2].bUsed);
+		}
+		xpItem = cJSON_GetObjectItem(xpSubobj, "pad_id");
+		if(xpItem)
+		{
+			gstSensorAttr[2].eSensorPadID = (MI_VIF_SNRPad_e)xpItem->valueint;
+			printf("sensor2->pad_id = %d \n", gstSensorAttr[2].eSensorPadID);
+		}
+		xpItem = cJSON_GetObjectItem(xpSubobj, "vif_group");
+		if(xpItem)
+		{
+			gstSensorAttr[2].u32VifGroupID = xpItem->valueint;
+			printf("sensor2->vif_group = %d \n", gstSensorAttr[2].u32VifGroupID);
+		}
+		xpItem = cJSON_GetObjectItem(xpSubobj, "vif_dev");
+		if(xpItem)
+		{
+			gstSensorAttr[2].u32BindVifDev = xpItem->valueint;
+			printf("sensor2->vif_dev = %d \n", gstSensorAttr[2].u32BindVifDev);
+		}
+	}
+	xpSubobj = cJSON_GetObjectItem(xpRoot, "used_hdmi");
+	if(xpSubobj)
+	{
+		if(xpSubobj->type == cJSON_True)
+		{
+			gstDisplayOpt.bUsedHdmi = TRUE;
+		}
+		else
+		{
+			gstDisplayOpt.bUsedHdmi = FALSE;
+		}
+		printf("used_hdmi = %d \n", gstDisplayOpt.bUsedHdmi);
+	}
+	xpSubobj = cJSON_GetObjectItem(xpRoot, "used_panel");
+	if(xpSubobj)
+	{
+		if(xpSubobj->type == cJSON_True)
+		{
+			gstDisplayOpt.bUsedPanel = TRUE;
+		}
+		else
+		{
+			gstDisplayOpt.bUsedPanel = FALSE;
+		}
+		printf("used_panel = %d \n", gstDisplayOpt.bUsedPanel);
+	}
+	if(close(S32ParmReadFd) < 0)
+	{
+		printf("close input file failed:%s \n", g_DualSensorParmFile);
+		printf("error:%s \n", strerror(errno));
+		return -1;
+	}
+	printf("close input file successful:%s \n", g_DualSensorParmFile);
+
+    return 1;
+}
 
 static void ST_Flush(void)
 {

@@ -32,6 +32,8 @@
 #include "dualsensor.h"
 #include "statusbarconfig.h"
 
+bool g_bSensorParmInit = true;
+
 /**
  * 注册定时器
  * 填充数组用于注册定时器
@@ -57,6 +59,18 @@ static void onUI_intent(const Intent *intentPtr) {
     if (intentPtr != NULL) {
         //TODO
     }
+
+    if(g_bSensorParmInit == true)
+	{
+		if(ST_SensorParamInit() < 0)
+		{
+			printf("Sensor parameter init failed!!! \n");
+		}
+		else
+		{
+			g_bSensorParmInit = false;
+		}
+	}
 
     SSTAR_DualSensorInit(0, 0);
 }
