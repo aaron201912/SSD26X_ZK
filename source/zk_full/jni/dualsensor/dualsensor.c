@@ -50,7 +50,7 @@
 
 #if defined(USE_ONE_SENSOR)
 #if !defined(SENSOR_PAD)
-MI_VIF_SNRPad_e g_eSensorPad = 0;
+MI_VIF_SNRPad_e g_eSensorPad = E_MI_VIF_SNRPAD_ID_0;
 #else
 MI_VIF_SNRPad_e g_eSensorPad = SENSOR_PAD;
 #endif
@@ -185,7 +185,7 @@ static ST_Sensor_Attr_t gstSensorAttr[ST_MAX_SENSOR_NUM] =
         .u32VifGroupID = 0,
         .u32BindVifDev = 0,
     #endif
-        .bPlaneMode = 1,
+        .bPlaneMode = 0,
         .u8ResIndex = 0/* 3840*2160,20fps @imx415 res 0 */,
         .s8IqPath = (char*)"/customer/mi_demo/imx415_api.bin",
     },
@@ -200,7 +200,7 @@ static ST_Sensor_Attr_t gstSensorAttr[ST_MAX_SENSOR_NUM] =
         .eSensorPadID = E_MI_VIF_SNRPAD_ID_1,
         .u32VifGroupID = 2,
         .u32BindVifDev = 8,
-        .bPlaneMode = 1,
+        .bPlaneMode = 0,
         .u8ResIndex = 0/* 1920*1080,30fps @imx307 res 0 */,
         .s8IqPath = (char*)"/customer/mi_demo/imx307_api.bin",
     },
@@ -398,6 +398,7 @@ int ST_SensorParamInit(void)
 		else
 		{
 			gstDisplayOpt.bUsedHdmi = FALSE;
+			g_s32SensorIdxForPanel = 0;
 		}
 		printf("used_hdmi = %d \n", gstDisplayOpt.bUsedHdmi);
 	}
@@ -801,25 +802,27 @@ MI_S32 ST_SensorModuleInit(MI_U32 eSnrPad)
     MI_S32 s32Input =0;
     MI_SNR_Res_t stRes;
     ST_Sensor_Attr_t *pstSensorAttr = NULL;
+
+    printf("eSnrPad = %d, u8ChocieRes= %d \n", eSnrPad, u8ChocieRes);
     memset(&stRes, 0x0, sizeof(MI_SNR_Res_t));
     memset(&stPad0Info, 0x0, sizeof(MI_SNR_PADInfo_t));
     memset(&stSnrPlane0Info, 0x0, sizeof(MI_SNR_PlaneInfo_t));
 
     pstSensorAttr = &gstSensorAttr[eSnrPadId];
 
-    if(pstSensorAttr->bPlaneMode == TRUE)
-    {
-        STCHECKRESULT(MI_SNR_SetPlaneMode(eSnrPad, FALSE));
-    }
-    else
-    {
-        STCHECKRESULT(MI_SNR_SetPlaneMode(eSnrPad, TRUE));
-    }
+	if(pstSensorAttr->bPlaneMode == TRUE)
+	{
+		STCHECKRESULT(MI_SNR_SetPlaneMode(gstSensorAttr[eSnrPad].eSensorPadID, TRUE));
+	}
+	else
+	{
+		STCHECKRESULT(MI_SNR_SetPlaneMode(gstSensorAttr[eSnrPad].eSensorPadID, FALSE));
+	}
 
-    STCHECKRESULT(MI_SNR_QueryResCount(eSnrPadId, &u32ResCount));
+    STCHECKRESULT(MI_SNR_QueryResCount(gstSensorAttr[eSnrPad].eSensorPadID, &u32ResCount));
     for(u8ResIndex=0; u8ResIndex < u32ResCount; u8ResIndex++)
     {
-        STCHECKRESULT(MI_SNR_GetRes(eSnrPadId, u8ResIndex, &stRes));
+        STCHECKRESULT(MI_SNR_GetRes(gstSensorAttr[eSnrPad].eSensorPadID, u8ResIndex, &stRes));
         printf("index %d, Crop(%d,%d,%d,%d), outputsize(%d,%d), maxfps %d, minfps %d, ResDesc %s\n",
         u8ResIndex,
         stRes.stCropRect.u16X, stRes.stCropRect.u16Y, stRes.stCropRect.u16Width,stRes.stCropRect.u16Height,
@@ -835,7 +838,7 @@ MI_S32 ST_SensorModuleInit(MI_U32 eSnrPad)
             scanf("%d", &s32Input);
             u8ChocieRes = (MI_U8)s32Input;
             ST_Flush();
-            STCHECKRESULT(MI_SNR_QueryResCount(eSnrPadId, &u32ResCount));
+            STCHECKRESULT(MI_SNR_QueryResCount(gstSensorAttr[eSnrPad].eSensorPadID, &u32ResCount));
             if(u8ChocieRes >= u32ResCount)
             {
                 printf("choice err res %d > =cnt %d\n", u8ChocieRes, u32ResCount);
@@ -845,8 +848,8 @@ MI_S32 ST_SensorModuleInit(MI_U32 eSnrPad)
     }
     printf("Rest %d\n", u8ChocieRes);
 
-    STCHECKRESULT(MI_SNR_SetRes(eSnrPadId, u8ChocieRes));
-    STCHECKRESULT(MI_SNR_Enable(eSnrPadId));
+    STCHECKRESULT(MI_SNR_SetRes(gstSensorAttr[eSnrPad].eSensorPadID, u8ChocieRes));
+    STCHECKRESULT(MI_SNR_Enable(gstSensorAttr[eSnrPad].eSensorPadID));
 
     return MI_SUCCESS;
 }
@@ -1889,6 +1892,10 @@ int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad)
         gstSensorAttr[0].bDoFr = 0;
         gstSensorAttr[1].bUsed = bSensor1Used;
         g_s32SensorIdxForPanel = 1;
+        if(gstDisplayOpt.bUsedHdmi == FALSE)
+        {
+        	g_s32SensorIdxForPanel = 0;
+        }
         g_s32SensorIdxForHdmi = 0;
      }
 #endif
@@ -1907,7 +1914,7 @@ int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad)
             continue;
         }
 
-        STCHECKRESULT(ST_SensorModuleInit(pstSensorAttr->eSensorPadID));
+        STCHECKRESULT(ST_SensorModuleInit(sensorIdx));
         STCHECKRESULT(ST_VifModuleInit(pstSensorAttr));
         STCHECKRESULT(ST_IspModuleInit(pstSensorAttr));
         STCHECKRESULT(ST_SclModuleInit(pstSensorAttr));
