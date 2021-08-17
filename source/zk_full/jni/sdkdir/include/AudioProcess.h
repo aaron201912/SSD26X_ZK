@@ -8,7 +8,6 @@
 //==============================================================================
 #ifndef AUDIOPROCESS_H_
 #define AUDIOPROCESS_H_
-
 typedef void* APC_HANDLE;
 typedef void* ANR_HANDLE;
 typedef void* EQ_HANDLE;
@@ -233,9 +232,7 @@ typedef struct
 
 }AudioAgcConfig;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 //==============================================================================
 //
 //                              FUNCTION PROTOTYPES
@@ -293,8 +290,5 @@ ALGO_AGC_RET IaaAgc_Free(AGC_HANDLE);
 AGC_HANDLE IaaAgc_Reset(char* working_buffer_address, AudioProcessInit *agc_init);
 ALGO_AGC_RET IaaAgc_GetConfig(AGC_HANDLE handle, AudioProcessInit *agc_init, AudioAgcConfig *agc_config);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif // #ifndef _AUDIOPROCESS_H_
