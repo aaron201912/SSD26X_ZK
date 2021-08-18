@@ -1548,7 +1548,10 @@ MI_S32 ST_DisplayFlowUnInit(ST_Display_Opt_t *pstDisplayOpt)
     MI_SCL_PORT SclOutPortId = 0;
     ST_Sys_BindInfo_T stBindInfo;
 
-    inputCnt = pstDisplayOpt->u8SensorCnt;
+    if(NULL == pstDisplayOpt)
+	{
+		return -1;
+	}
 
     /* Deinit Panel */
     if(pstDisplayOpt->bUsedPanel)
@@ -1602,11 +1605,12 @@ MI_S32 ST_DisplayFlowUnInit(ST_Display_Opt_t *pstDisplayOpt)
     /* Deinit HDMI */
     if(pstDisplayOpt->bUsedHdmi)
     {
-        if(NULL == pstDisplayOpt || pstDisplayOpt->u8SensorCnt <= 0)
+        if(pstDisplayOpt->u8SensorCnt <= 0)
         {
             return -1;
         }
 
+        inputCnt = pstDisplayOpt->u8SensorCnt;
         s32DispLayer = pstDisplayOpt->s32HdmiLayer;
         /* set inputport */
         if(1 == inputCnt)
