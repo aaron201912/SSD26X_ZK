@@ -1323,6 +1323,7 @@ MI_S32 ST_DisplayFlowInit(ST_Display_Opt_t *pstDisplayOpt, int inputCnt)
         u8DispInport = pstDisplayOpt->u8PanelInputPort;
         u32DispWidth = pstDisplayOpt->u32PanelW;
         u32DispHeight = pstDisplayOpt->u32PanelH;
+
         if(E_MI_SYS_ROTATE_90 == pstDisplayOpt->ePanelRot ||\
             E_MI_SYS_ROTATE_270 == pstDisplayOpt->ePanelRot)
         {
@@ -1394,6 +1395,7 @@ MI_S32 ST_DisplayFlowInit(ST_Display_Opt_t *pstDisplayOpt, int inputCnt)
             stBindInfo.stSrcChnPort.eModId = E_MI_MODULE_ID_SCL;
             stBindInfo.stSrcChnPort.u32DevId = SclDevId;
             stBindInfo.stSrcChnPort.u32ChnId = SclChnId;
+
             stBindInfo.stSrcChnPort.u32PortId = SclOutPortId;
             stBindInfo.stDstChnPort.eModId = E_MI_MODULE_ID_DISP;
             stBindInfo.stDstChnPort.u32DevId = pstDisplayOpt->s32PanelDev;
@@ -1533,7 +1535,6 @@ MI_S32 ST_DisplayFlowInit(ST_Display_Opt_t *pstDisplayOpt, int inputCnt)
         #endif
         }
     }
-
     return MI_SUCCESS;
 }
 
@@ -1546,11 +1547,6 @@ MI_S32 ST_DisplayFlowUnInit(ST_Display_Opt_t *pstDisplayOpt)
     MI_SCL_CHANNEL SclChnId = 0;
     MI_SCL_PORT SclOutPortId = 0;
     ST_Sys_BindInfo_T stBindInfo;
-
-    if(NULL == pstDisplayOpt || pstDisplayOpt->u8SensorCnt <= 0)
-    {
-        return -1;
-    }
 
     inputCnt = pstDisplayOpt->u8SensorCnt;
 
@@ -1606,6 +1602,11 @@ MI_S32 ST_DisplayFlowUnInit(ST_Display_Opt_t *pstDisplayOpt)
     /* Deinit HDMI */
     if(pstDisplayOpt->bUsedHdmi)
     {
+        if(NULL == pstDisplayOpt || pstDisplayOpt->u8SensorCnt <= 0)
+        {
+            return -1;
+        }
+
         s32DispLayer = pstDisplayOpt->s32HdmiLayer;
         /* set inputport */
         if(1 == inputCnt)
@@ -1865,7 +1866,8 @@ static MI_S32 g_s32Frid = -1;
 
 int SSTAR_DualSensorInit(MI_BOOL bEnableFr, int doFrPad)
 {
-    int sensorIdx, totalCnt;
+    int sensorIdx;
+    int totalCnt = 0;
     ST_Sensor_Attr_t *pstSensorAttr = NULL;
 
 #ifndef USE_ONE_SENSOR
@@ -1977,7 +1979,6 @@ void SSTAR_DualSensorDeinit()
 		ST_VifModuleUnInit(pstSensorAttr);
 		ST_SensorModuleUnInit(pstSensorAttr->eSensorPadID);
 	}
-
 
 	//ST_MiscUnInit();
 	return;
