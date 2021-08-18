@@ -7,9 +7,12 @@
 //
 //==============================================================================
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifndef AUDIOAEDPROCESS_H_
 #define AUDIOAEDPROCESS_H_
-#define API_VERSION             {'1','1'}
+#define AED_API_VERSION             {'1','1'}
 
 //==============================================================================
 //
@@ -81,3 +84,6 @@ ALGO_AED_RET IaaAed_RunLsd(AedHandle handle,short *audio_input, int *lsd_db);
 ALGO_AED_RET IaaAed_GetLsdResult(AedHandle handle, int* lsd_result);
 ALGO_AED_RET IaaAed_Release(AedHandle handle);
 #endif // #ifndef AUDIOAEDPROCESS_H_
+#ifdef __cplusplus
+}
+#endif

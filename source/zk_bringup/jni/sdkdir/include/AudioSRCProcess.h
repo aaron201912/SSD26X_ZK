@@ -1,6 +1,11 @@
 #ifndef AUDIOSRCPROCESS_H_
 #define AUDIOSRCPROCESS_H_
-#define API_VERSION                  	{'1','1'}
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define SRC_API_VERSION                  	{'1','2'}
 
 typedef enum {
 	ALGO_SRC_RET_SUCCESS				= 0x00000000,
@@ -36,11 +41,17 @@ typedef enum{
     SRATE_48K =  48
 }SrcInSrate;
 
+typedef enum{
+    ORDER_LOW	=	0,
+	ORDER_HIGH	=	1
+}SrcFilterOrder;
+
 typedef void* SRC_HANDLE;
 
 typedef struct{
     SrcInSrate WaveIn_srate;
     SrcConversionMode mode;
+    SrcFilterOrder order;
     unsigned int channel;
     unsigned int point_number;
 }SRCStructProcess;
@@ -50,4 +61,7 @@ SRC_HANDLE IaaSrc_Init(char *workingBufferAddress, SRCStructProcess *src_struct)
 ALGO_SRC_RET IaaSrc_Run(SRC_HANDLE handle, short *audio_input, short *audio_output, int* output_size);
 ALGO_SRC_RET IaaSrc_Release(SRC_HANDLE handle);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* AUDIOSRCPROCESS_H_ */

@@ -3,7 +3,7 @@ extern "C" {
 #endif
 #ifndef _AUDIOSLLPROCESS_H_
 #define _AUDIOSLLPROCESS_H_
-#define API_VERSION             {'1','1'}
+#define SSL_API_VERSION             {'1','1'}
 
 typedef struct
 {

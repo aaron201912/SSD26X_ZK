@@ -3,14 +3,14 @@ extern "C" {
 #endif
 #ifndef _AUDIOBFPROCESS_H_
 #define _AUDIOBFPROCESS_H_
-#define API_VERSION             {'1','1'}
+#define BF_API_VERSION             {'1','1'}
 
 typedef struct
 {
 	unsigned int point_number;
 	unsigned int sample_rate; // 8k or 16k
 	unsigned int mic_distance; //cm
-	unsigned int channel; //only support 2
+	unsigned int channel;
 }AudioBfInit;
 
 typedef struct
@@ -37,7 +37,8 @@ typedef enum {
 	ALGO_BF_RET_INVALID_POINTNUMBER 		= 0x10000310,
 	ALGO_BF_RET_INVALID_CHANNEL 			= 0x10000311,
 	ALGO_BF_RET_INVALID_CALLING			 	= 0x10000312,
-	ALGO_BF_RET_API_CONFLICT				= 0x10000313
+	ALGO_BF_RET_API_CONFLICT				= 0x10000313,
+	ALGO_BF_RET_INVALID_GEOMETRY_TYPE       = 0x10000314,
 
 } ALGO_BF_RET;
 
@@ -47,9 +48,10 @@ unsigned int IaaBf_GetBufferSize(void);
 BF_HANDLE IaaBf_Init(char* working_buffer,AudioBfInit* bf_init);
 ALGO_BF_RET IaaBf_Config(BF_HANDLE handle,AudioBfConfig* bf_config);
 ALGO_BF_RET IaaBf_Get_Config(BF_HANDLE handle,AudioBfConfig *bf_config);
-ALGO_BF_RET IaaBf_Run(BF_HANDLE handle,short* microphone_input,int * microphone_doa);
+ALGO_BF_RET IaaBf_Run(BF_HANDLE handle,short* microphone_input,short* microphone_output,int * microphone_doa);
 BF_HANDLE IaaBf_Reset(BF_HANDLE working_buffer,AudioBfInit* bf_init);
 ALGO_BF_RET IaaBf_Free(BF_HANDLE handle);
+ALGO_BF_RET IaaBf_Setshape(BF_HANDLE handle,int shape);
 
 #endif
 #ifdef __cplusplus

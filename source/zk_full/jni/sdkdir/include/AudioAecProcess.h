@@ -13,7 +13,7 @@ extern "C" {
 #ifndef _AUDIOAECPROCESS_H_
 #define _AUDIOAECPROCESS_H_
 
-#define API_VERSION                  	{'1','1'}
+#define AEC_API_VERSION                  	{'1','1'}
 
 //==============================================================================
 //
