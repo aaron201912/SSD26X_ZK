@@ -52,6 +52,11 @@ INCLUDE_DIR :=  -I$(EASYUI_COMMON_INCLUDE) \
                 -I ../jni/internal/disp \
                 -I ../jni/internal/hdmi \
                 -I ../jni/internal/rgn \
+                -I ../jni/uvc/app \
+                -I ../jni/uvc/v4l2/inc \
+                -I ../jni/uvc/v4l2/src \
+                -I ../jni/uvc/libjpeg/include \
+                -I ../jni/uvc/libyuv/include	\
                 -I ../jni/dualsensor \
                 -I ../jni/aed_kws_detect \
                 -I ../jni/util 

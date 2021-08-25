@@ -484,7 +484,8 @@ const char* IconTab[]={
 	"localsettingActivity",
 	"facerecognitionActivity",
 	"glassActivity",
-	"kwsvoicedetectActivity"
+	"kwsvoicedetectActivity",
+	"usbCameraActivity"
 };
 
 static void onSlideItemClick_Slidewindow1(ZKSlideWindow *pSlideWindow, int index) {
