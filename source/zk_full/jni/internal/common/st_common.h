@@ -131,6 +131,7 @@ extern "C"{
 #define YUYV_GREEN              MAKE_YUYV_VALUE(149,43,21)
 #define YUYV_BLUE               MAKE_YUYV_VALUE(29,225,107)
 
+#define ALIGN_DOWN(x, align) 	(((x)/(align))*(align))
 #define ALIGN_UP(x, align)      (((x) + ((align) - 1)) & ~((align) - 1))
 #define ALIGN_BACK(x, a)        (((x) / (a)) * (a))
 #define ALIGN_FRONT(x, a)           ((((x)+(a)/2) / (a)) * (a))
