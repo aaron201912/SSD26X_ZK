@@ -1018,6 +1018,7 @@ int video_init(Device_Handle_t *video_dev)
     if(fd < 0)
     {
         UVC_ERR(video_dev, "Cannot open video device: %s.\n", strerror(errno));
+        mTextView_open_failPtr->setVisible(true);
         return -errno;
     }
 
