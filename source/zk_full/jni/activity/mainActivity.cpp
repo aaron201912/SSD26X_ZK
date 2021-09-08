@@ -269,7 +269,7 @@ void mainActivity::onSlideItemClick(ZKSlideWindow *pSlideWindow, int index) {
 				printf("UI process send %d to exit\n", IPC_COMMAND_UI_EXIT);
 				exit(0);
         	}
-        	else
+        	else if(index == STR_ICON_INDEX)
         	{
 				//str suspend in
 				printf("suspend in\n");
@@ -289,6 +289,10 @@ void mainActivity::onSlideItemClick(ZKSlideWindow *pSlideWindow, int index) {
 				Enter_STR_ResumeMode();
 				gettimeofday(&tv_pre, NULL);
 				break;
+        	}
+        	else
+        	{
+        		;
         	}
         }
     }

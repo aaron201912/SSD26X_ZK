@@ -392,7 +392,7 @@ static MI_S32 St_JpdModuleDeinit(void)
 {
     ExecFunc(MI_JPD_StopChn(JPD_DEV_ID, JPD_CHN_ID), MI_SUCCESS);
     ExecFunc(MI_JPD_DestroyChn(JPD_DEV_ID, JPD_CHN_ID), MI_SUCCESS);
-
+    ExecFunc(MI_JPD_DestroyDev(JPD_DEV_ID), MI_SUCCESS);
     return MI_SUCCESS;
 }
 

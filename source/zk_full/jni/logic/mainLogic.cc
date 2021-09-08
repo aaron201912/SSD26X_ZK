@@ -46,6 +46,8 @@
 #define BACKLIGHT_GPIO	62	// 7
 #define POWERCTRL_GPIO	63	// 8
 
+#define STR_ICON_INDEX	17
+
 extern int ST_FRInit();
 
 static int g_isSupportFr = -1;
