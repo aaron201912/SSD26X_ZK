@@ -3,7 +3,7 @@ TARGET = zkgui
 #赋值对应的路径,此路径需要和本地sdk路径一致
 #PROJECT_PATH=/home/beal.wu/i2m_i6_master/project
 #PROJECT_PATH=/home/koda.xu/I6/master/project
-PROJECT_PATH = ../zk_bringup/jni/sdkdir
+PROJECT_PATH = ../zk_full/jni/sdkdir
 
 ZKGUI_PATH=./zkgui_dir
 COMPILE_ROOT := $(shell pwd)
@@ -33,7 +33,11 @@ CPPOBJS = $(patsubst %.cpp, %.cpp.o, $(CPPSRCS))
 CSRCS += ${wildcard *.c}
 COBJS = $(patsubst %.c,%.c.o,$(CSRCS))
 
-all:$(TARGET) install
+install: $(TARGET)
+	-mkdir -p $(CONFIG_PREFIX)/bin
+	-mv $(TARGET) $(CONFIG_PREFIX)/bin/
+
+all:
 
 $(TARGET):$(CPPOBJS) $(COBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LOCAL_CFLAGS) $(LOCAL_LDFLAGS) -o $@ $^
@@ -44,9 +48,6 @@ $(CPPOBJS):%.cpp.o:%.cpp
 $(COBJS):%.c.o:%.c
 	$(CC) -DENABLE_HDMI=$(ENABLE_HDMI) -DENABLE_MIPI=$(ENABLE_MIPI) $(CFLAGS) $(LDFLAGS) $(LOCAL_CFLAGS) $(LOCAL_LDFLAGS) -c $^ -o $@
 
-install:
-	-mkdir -p $(CONFIG_PREFIX)/bin
-	-mv $(TARGET) $(CONFIG_PREFIX)/bin/
 
 clean:
 	-rm -rf $(CPPOBJS) $(CONFIG_PREFIX)/bin/
