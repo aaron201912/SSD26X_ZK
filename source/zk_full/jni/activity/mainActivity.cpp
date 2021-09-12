@@ -247,12 +247,12 @@ void mainActivity::onSlideItemClick(ZKSlideWindow *pSlideWindow, int index) {
     {
         if (SSlideWindowItemClickCallbackTab[i].id == pSlideWindow->getID())
         {
-        	if (index < (sizeof(IconTab) / sizeof(const char*)))
+        	if (index < (int)(sizeof(IconTab) / sizeof(const char*)))
         	{
         		SSlideWindowItemClickCallbackTab[i].onSlideItemClickCallback(pSlideWindow, index);
         		break;
         	}
-        	else if(index == (sizeof(IconTab) / sizeof(const char*)))
+        	else if(index == (int)(sizeof(IconTab) / sizeof(const char*)))
         	{
         		// browser
         		IPCOutput o(SSD_IPC);
@@ -269,7 +269,7 @@ void mainActivity::onSlideItemClick(ZKSlideWindow *pSlideWindow, int index) {
 				printf("UI process send %d to exit\n", IPC_COMMAND_UI_EXIT);
 				exit(0);
         	}
-        	else if(index == STR_ICON_INDEX)
+        	else
         	{
 				//str suspend in
 				printf("suspend in\n");
@@ -289,10 +289,6 @@ void mainActivity::onSlideItemClick(ZKSlideWindow *pSlideWindow, int index) {
 				Enter_STR_ResumeMode();
 				gettimeofday(&tv_pre, NULL);
 				break;
-        	}
-        	else
-        	{
-        		;
         	}
         }
     }

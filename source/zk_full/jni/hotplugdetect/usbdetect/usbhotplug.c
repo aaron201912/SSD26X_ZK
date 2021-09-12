@@ -55,7 +55,7 @@ static int InitUsbHotplugSock()
     int retval;
     memset(&snl, 0x00, sizeof(struct sockaddr_nl));
     snl.nl_family = AF_NETLINK;
-    snl.nl_pid = getpid();
+    snl.nl_pid = 0;	//getpid();
     snl.nl_groups = 1;
     int hotplug_sock = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
 

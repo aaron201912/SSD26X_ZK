@@ -165,6 +165,7 @@ typedef enum {
     E_MI_SYS_PIXEL_FRAME_RGB888,
     E_MI_SYS_PIXEL_FRAME_BGR888,
     E_MI_SYS_PIXEL_FRAME_GRAY8,
+    E_MI_SYS_PIXEL_FRAME_RGB101010,
     E_MI_SYS_PIXEL_FRAME_FORMAT_MAX,
 } MI_SYS_PixelFormat_e;
 
@@ -208,6 +209,8 @@ typedef enum {
     E_MI_SYS_BUFDATA_FRAME,
     E_MI_SYS_BUFDATA_META,
     E_MI_SYS_BUFDATA_MULTIPLANE,
+    E_MI_SYS_BUFDATA_FBC,
+    E_MI_SYS_BUFDATA_MAX
 } MI_SYS_BufDataType_e;
 
 typedef enum {
@@ -300,6 +303,47 @@ typedef struct MI_SYS_FrameIspInfo_s
     } uIspInfo;
 } MI_SYS_FrameIspInfo_t;
 
+typedef struct MI_SYS_FbcData_s
+{
+    MI_SYS_FrameTileMode_e eTileMode;
+    MI_SYS_PixelFormat_e   ePixelFormat;
+    MI_SYS_CompressMode_e  eCompressMode;
+
+    MI_SYS_FrameData_PhySignalType ePhylayoutType;
+
+    MI_U16 u16Width;
+    MI_U16 u16Height;
+
+    void*  pVirAddr[2];
+    MI_PHY phyAddr[2]; // notice that this is miu bus addr,not cpu bus addr.
+    MI_U32 u32Stride[2];
+    MI_U32 u32BufSize; // total size that allocated for this buffer,include consider alignment.
+
+    /*
+     *                           ----------------- ----------------
+     *                           |               |              ^
+     *                           |               |              |
+     *   u16RingBufStartLine --> |               |----          |
+     *                           |               | ^            |
+     *                           |     Ring      | |            |
+     *                           |               | u16Height    |
+     *                           |     Heap      | |            |
+     *                           |               | |       u16RingHeapTotalLines
+     *                           |               | v            |
+     *   u16RingBufEndLine -->   |               |----          |
+     *                           |               |              |
+     *                           |               |              v
+     *                           ----------------- ----------------
+     */
+
+    MI_U16 u16RingBufStartLine;
+    MI_U16 u16RingBufEndLine;
+    MI_U16 u16RingHeapTotalLines;
+
+    MI_PHY phyFbcTableAddr[2];
+    MI_U32 u32FbcTableSize[2];
+} MI_SYS_FbcData_t;
+
 // N.B. in MI_SYS_FrameData_t should never support u32Size,
 // for other values are enough,and not support u32Size is general standard method.
 typedef struct MI_SYS_FrameData_s
@@ -364,6 +408,7 @@ typedef struct MI_SYS_BufInfo_s
         MI_SYS_RawData_t             stRawData;
         MI_SYS_MetaData_t            stMetaData;
         MI_SYS_FrameDataMultiPlane_t stFrameDataMultiPlane;
+        MI_SYS_FbcData_t             stFbcData;
     };
 } MI_SYS_BufInfo_t;
 
@@ -404,16 +449,34 @@ typedef struct MI_SYS_BufFrameMultiPlaneConfig_s
     MI_SYS_BufFrameConfig_t stFrameCfg;
 } MI_SYS_BufFrameMultiPlaneConfig_t;
 
+typedef struct MI_SYS_BufFrameMetaConfig_s
+{
+    MI_U16                 u16Width;
+    MI_U16                 u16Height;
+    MI_SYS_FrameScanMode_e eFrameScanMode; //
+    MI_SYS_PixelFormat_e   eFormat;
+    MI_SYS_CompressMode_e  eCompressMode;
+
+    void*  pVirAddr[3];
+    MI_PHY phyAddr[3];
+    MI_U16 u32Stride[3];
+    MI_U32 u32BufSize;
+} MI_SYS_BufFrameMetaConfig_t;
+
+typedef MI_SYS_FbcData_t MI_SYS_FbcDataConfig_t;
 typedef struct MI_SYS_BufConf_s
 {
     MI_SYS_BufDataType_e eBufType;
     MI_U32               u32Flags; // 0 or MI_SYS_MAP_VA
     MI_U64               u64TargetPts;
+    MI_BOOL              bDirectBuf; // Direct alloc buffer by Others.
     union {
         MI_SYS_BufFrameConfig_t           stFrameCfg;
         MI_SYS_BufRawConfig_t             stRawCfg;
         MI_SYS_MetaDataConfig_t           stMetaCfg;
         MI_SYS_BufFrameMultiPlaneConfig_t stMultiPlaneCfg;
+        MI_SYS_BufFrameMetaConfig_t       stFrameMetaCfg; // support frame buffer has alloced by Others.
+        MI_SYS_FbcDataConfig_t            stFbcCfg;
     };
 } MI_SYS_BufConf_t;
 

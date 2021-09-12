@@ -72,7 +72,7 @@ LDFLAGS += -L$(ZKSW_PREBUILT_LIB_PATH)/system -L. -L ../jni/sdkdir/lib
 #LDFLAGS += -DUSE_ONE_SENSOR -DSENSOR_PAD=0
 
 INCLUDE_DIR += -I ../jni/hotplugdetect -I ../jni/hotplugdetect/common -I ../jni/hotplugdetect/usbdetect -I ../jni/hotplugdetect/wifidetect \
-               -I ../jni/hotplugdetect/wirednetworkdetect
+               -I ../jni/hotplugdetect/wirednetworkdetect -I ../jni/player/imagedata
 
 TARGET=../libs/armeabi/libzkgui.so
 
