@@ -483,7 +483,6 @@ const char* IconTab[]={
 	"dualsensorActivity",
 	"localMediaActivity",
 	"playlistActivity",
-	"localsettingActivity",
 	"playPcmFileActivity",
 	"localsettingActivity",
 	"facerecognitionActivity",

@@ -227,7 +227,6 @@ static MI_S32 St_VdecModuleInit(Device_Handle_t *video_dev)
     stSysChnPort.u32DevId = VDEC_DEV_ID;
     stSysChnPort.u32ChnId = VDEC_CHN_ID;
     stSysChnPort.u32PortId = VDEC_PORT_ID;
-    stVdecInitParam.bDisableLowLatency = false;
     stVdecChnAttr.eCodecType = (video_dev->pixelformat == V4L2_PIX_FMT_H264) ? E_MI_VDEC_CODEC_TYPE_H264 : E_MI_VDEC_CODEC_TYPE_H265;
     stVdecChnAttr.eDpbBufMode = E_MI_VDEC_DPB_MODE_NORMAL;
     stVdecChnAttr.eVideoMode = E_MI_VDEC_VIDEO_MODE_FRAME;
@@ -1104,7 +1103,7 @@ static void *uvc_stream(void *arg)
 
 		if((tv_after.tv_sec - tv_before.tv_sec)*1000*1000 + (tv_after.tv_usec - tv_before.tv_usec) >= 1*1000*1000)
 		{
-			printf("%s Current Frame Rate:%d fps.\n", video_dev->path, frame_cnt);
+			//printf("%s Current Frame Rate:%d fps.\n", video_dev->path, frame_cnt);
 			frame_cnt = 0;
 
 			if(gettimeofday(&tv_before, NULL))
