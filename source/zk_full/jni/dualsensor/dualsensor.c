@@ -1413,41 +1413,41 @@ MI_S32 ST_DisplayFlowInit(ST_Display_Opt_t *pstDisplayOpt, int inputCnt)
     {
         s32DispLayer = pstDisplayOpt->s32HdmiLayer;
         /* set inputport */
-        if(1 == inputCnt)
-        {
-            u8DispInport = 0;
-            SclChnId = gstSensorAttr[0].eSensorPadID;
-            u32DispWidth = pstDisplayOpt->u32HdmiW;
-            u32DispHeight = pstDisplayOpt->u32HdmiH;
-            memset(&stWinRect, 0x0, sizeof(MI_DISP_VidWinRect_t));
-            memset(&stInputPortAttr, 0x0, sizeof(MI_DISP_InputPortAttr_t));
-            stInputPortAttr.stDispWin.u16X = 0;
-            stInputPortAttr.stDispWin.u16Y = 0;
-            stInputPortAttr.stDispWin.u16Width = u32DispWidth;
-            stInputPortAttr.stDispWin.u16Height = u32DispHeight;
-            stInputPortAttr.u16SrcWidth = u32DispWidth;
-            stInputPortAttr.u16SrcHeight = u32DispHeight;
-            stWinRect.u16Width = u32DispWidth;
-            stWinRect.u16Height = u32DispHeight;
-            STCHECKRESULT(MI_DISP_SetInputPortAttr(s32DispLayer, u8DispInport, &stInputPortAttr));
-            STCHECKRESULT(MI_DISP_EnableInputPort(s32DispLayer, u8DispInport));
-            STCHECKRESULT(MI_DISP_SetInputPortSyncMode(s32DispLayer, u8DispInport, E_MI_DISP_SYNC_MODE_FREE_RUN));
-            // Only one sensor, bind directly
-            memset(&stBindInfo, 0x0, sizeof(ST_Sys_BindInfo_T));
-            stBindInfo.stSrcChnPort.eModId = E_MI_MODULE_ID_SCL;
-            stBindInfo.stSrcChnPort.u32DevId = 0;
-            stBindInfo.stSrcChnPort.u32ChnId = SclChnId;
-            stBindInfo.stSrcChnPort.u32PortId = 1;
-            stBindInfo.stDstChnPort.eModId = E_MI_MODULE_ID_DISP;
-            stBindInfo.stDstChnPort.u32DevId = pstDisplayOpt->s32HdmiDev;
-            stBindInfo.stDstChnPort.u32ChnId = TO_SYS_CHN_ID(pstDisplayOpt->s32HdmiLayer, u8DispInport);
-            stBindInfo.stDstChnPort.u32PortId = 0;
-            stBindInfo.u32SrcFrmrate = 30;
-            stBindInfo.u32DstFrmrate = 30;
-            stBindInfo.eBindType = E_MI_SYS_BIND_TYPE_FRAME_BASE;
-            STCHECKRESULT(ST_Sys_Bind(&stBindInfo));
-        }
-        else
+//        if(1 == inputCnt)
+//        {
+//            u8DispInport = 0;
+//            SclChnId = gstSensorAttr[0].eSensorPadID;
+//            u32DispWidth = pstDisplayOpt->u32HdmiW;
+//            u32DispHeight = pstDisplayOpt->u32HdmiH;
+//            memset(&stWinRect, 0x0, sizeof(MI_DISP_VidWinRect_t));
+//            memset(&stInputPortAttr, 0x0, sizeof(MI_DISP_InputPortAttr_t));
+//            stInputPortAttr.stDispWin.u16X = 0;
+//            stInputPortAttr.stDispWin.u16Y = 0;
+//            stInputPortAttr.stDispWin.u16Width = u32DispWidth;
+//            stInputPortAttr.stDispWin.u16Height = u32DispHeight;
+//            stInputPortAttr.u16SrcWidth = u32DispWidth;
+//            stInputPortAttr.u16SrcHeight = u32DispHeight;
+//            stWinRect.u16Width = u32DispWidth;
+//            stWinRect.u16Height = u32DispHeight;
+//            STCHECKRESULT(MI_DISP_SetInputPortAttr(s32DispLayer, u8DispInport, &stInputPortAttr));
+//            STCHECKRESULT(MI_DISP_EnableInputPort(s32DispLayer, u8DispInport));
+//            STCHECKRESULT(MI_DISP_SetInputPortSyncMode(s32DispLayer, u8DispInport, E_MI_DISP_SYNC_MODE_FREE_RUN));
+//            // Only one sensor, bind directly
+//            memset(&stBindInfo, 0x0, sizeof(ST_Sys_BindInfo_T));
+//            stBindInfo.stSrcChnPort.eModId = E_MI_MODULE_ID_SCL;
+//            stBindInfo.stSrcChnPort.u32DevId = 0;
+//            stBindInfo.stSrcChnPort.u32ChnId = SclChnId;
+//            stBindInfo.stSrcChnPort.u32PortId = 1;
+//            stBindInfo.stDstChnPort.eModId = E_MI_MODULE_ID_DISP;
+//            stBindInfo.stDstChnPort.u32DevId = pstDisplayOpt->s32HdmiDev;
+//            stBindInfo.stDstChnPort.u32ChnId = TO_SYS_CHN_ID(pstDisplayOpt->s32HdmiLayer, u8DispInport);
+//            stBindInfo.stDstChnPort.u32PortId = 0;
+//            stBindInfo.u32SrcFrmrate = 30;
+//            stBindInfo.u32DstFrmrate = 30;
+//            stBindInfo.eBindType = E_MI_SYS_BIND_TYPE_FRAME_BASE;
+//            STCHECKRESULT(ST_Sys_Bind(&stBindInfo));
+//        }
+//        else
         {
         #if USE_HDMI_4_SCREEN
             pstDisplayOpt->u8SensorCnt = inputCnt;
