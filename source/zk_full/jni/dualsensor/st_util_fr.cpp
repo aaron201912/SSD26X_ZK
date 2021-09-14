@@ -848,8 +848,6 @@ MI_S32 ST_FRStop(MI_S32 s32Frid)
     stRgnChnPort.s32ChnId = gStFrInstance[s32Frid].sclChn;
     stRgnChnPort.s32PortId = gStFrInstance[s32Frid].rgnPort;
     STCHECKRESULT(MI_RGN_DetachFromChn(0, gStFrInstance[s32Frid].rgnHandle, &stRgnChnPort));
-    ST_OSD_Destroy(gStFrInstance[s32Frid].rgnHandle);
-    ST_OSD_Deinit();
 
     g_st_XC_FaceRecognition.pfnXC_FaceRecognition_ReleaseHandle(gStFrInstance[s32Frid].frHandle);
     if(0 == ST_FreeFrInstance(s32Frid))
@@ -857,6 +855,9 @@ MI_S32 ST_FRStop(MI_S32 s32Frid)
         g_st_XC_FaceRecognition.pfnXC_FaceRecognition_Cleanup();
     }
     g_bIpuStart = FALSE;
+
+    ST_OSD_Destroy(gStFrInstance[s32Frid].rgnHandle);
+    ST_OSD_Deinit();
 
     return MI_SUCCESS;
 }
