@@ -324,10 +324,9 @@ void *SSTAR_VdecSendStream(void *args)
     if ((access(g_VideoPath, F_OK)) != -1)
     {
     	readfp = fopen(g_VideoPath, "rb"); //ES
-    	ST_DBG("open %s err\n", g_VideoPath);
     }
 
-    if (!readfp)
+    if (readfp == NULL)
     {
         ST_ERR("Open es file failed!\n");
         return NULL;
@@ -416,6 +415,15 @@ void *SSTAR_VdecSendStream(void *args)
     printf("\n\n");
     usleep(300000);
     free(pu8Buf);
+	if (fclose(readfp) < 0)
+	{
+		ST_ERR("close es file failed!\n");
+		return NULL;
+	}
+	else
+	{
+		printf("close es file\n");
+	}
     printf("End----------------------%d------------------End\n", stChnPort.u32ChnId);
 
     return NULL;
@@ -429,7 +437,6 @@ MI_S32 SSTAR_CreateVdecChannel(MI_S32 s32VdecChn, MI_S32 s32CodecType,
     MI_VDEC_InitParam_t stVdecInitParam;
 
     memset(&stVdecInitParam, 0, sizeof(MI_VDEC_InitParam_t));
-    stVdecInitParam.bDisableLowLatency = false;
     //MI_VDEC_InitDev(&stVdecInitParam);
     MI_VDEC_CreateDev(0, &stVdecInitParam);
 
