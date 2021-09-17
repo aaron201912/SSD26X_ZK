@@ -1078,11 +1078,12 @@ static void StartDisplayImage(char *pFileName)
 	printf("img width=%d, height=%d, colorbits=%d\n", imgWidth, imgHeight, colorBits);
 	stbi_image_free(data);
 
-	LayoutPosition imgPosition = mTextView_picPtr->getPosition();
+	LayoutPosition imgPosition = mVideoview_videoPtr->getPosition();
 	imgPosition.mLeft = imgPosition.mLeft + (imgPosition.mWidth - imgWidth) / 2;
 	imgPosition.mTop = imgPosition.mTop + (imgPosition.mHeight - imgHeight) / 2;
 	imgPosition.mWidth = imgWidth;
 	imgPosition.mHeight = imgHeight;
+
 	mTextView_picPtr->setPosition(imgPosition);
 	mTextView_picPtr->setBackgroundPic(pFileName);
 
