@@ -219,13 +219,6 @@ IPCOutput o_client(CLT_IPC);
 #include "mi_gfx.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-//#include "frame.h"
-//#include "demux.h"
-//#include "videostream.h"
-//#include "audiostream.h"
-//#include "player.h"
-//#include "blitutil.h"
-
 #include "panelconfig.h"
 #include "hotplugdetect.h"
 #include "imageplayer.h"
@@ -357,12 +350,12 @@ void ShowToolbar(bool bShow)
 	{
 		mTextview_volTitlePtr->setVisible(false);
 		mTextview_volumePtr->setVisible(false);
-		mSeekbar_progressPtr->setVisible(false);
+		mSeekbar_progressPtr->setVisible(true);
 		mButton_voicePtr->setVisible(false);
 		mSeekbar_volumnPtr->setVisible(false);
 		mTextview_slashPtr->setVisible(false);
-		mTextview_durationPtr->setVisible(false);
-		mTextview_curtimePtr->setVisible(false);
+		mTextview_durationPtr->setVisible(true);
+		mTextview_curtimePtr->setVisible(true);
 	}
 }
 
@@ -442,233 +435,6 @@ int GetPlayerVolumn()
 	mTextview_volumePtr->setText(volInfo);
 	return vol;
 }
-#if 0
-MI_S32 StartPlayAudio()
-{
-    MI_AUDIO_Attr_t stSetAttr;
-    MI_AUDIO_Attr_t stGetAttr;
-    MI_AUDIO_DEV AoDevId = AUDIO_DEV;
-    MI_AO_CHN AoChn = AUDIO_CHN;
-
-    MI_S32 s32SetVolumeDb;
-    MI_S32 s32GetVolumeDb;
-
-    MI_AO_InitParam_t stInitParam;
-
-    system("echo 1 > /sys/class/gpio/gpio12/value");
-
-    memset(&stInitParam, 0x0, sizeof(MI_AO_InitParam_t));
-    stInitParam.u32DevId = AoDevId;
-    stInitParam.u8Data = NULL;
-    MI_AO_InitDev(&stInitParam);
-
-    //set Ao Attr struct
-    memset(&stSetAttr, 0, sizeof(MI_AUDIO_Attr_t));
-    stSetAttr.eBitwidth = E_MI_AUDIO_BIT_WIDTH_16;
-    stSetAttr.eWorkmode = E_MI_AUDIO_MODE_I2S_MASTER;
-    stSetAttr.u32FrmNum = 6;
-    stSetAttr.u32PtNumPerFrm = AUDIO_SAMPLE_PER_FRAME;
-    stSetAttr.u32ChnCnt = 1;
-
-    if(stSetAttr.u32ChnCnt == 2)
-    {
-        stSetAttr.eSoundmode = E_MI_AUDIO_SOUND_MODE_STEREO;
-    }
-    else if(stSetAttr.u32ChnCnt == 1)
-    {
-        stSetAttr.eSoundmode = E_MI_AUDIO_SOUND_MODE_MONO;
-    }
-
-    stSetAttr.eSamplerate = E_MI_AUDIO_SAMPLE_RATE_48000;
-
-    /* set ao public attr*/
-    MI_AO_SetPubAttr(AoDevId, &stSetAttr);
-
-    /* get ao device*/
-    MI_AO_GetPubAttr(AoDevId, &stGetAttr);
-
-    /* enable ao device */
-    MI_AO_Enable(AoDevId);
-
-    /* enable ao channel of device*/
-    MI_AO_EnableChn(AoDevId, AoChn);
-
-
-    /* if test AO Volume */
-    if (g_s32VolValue)
-    	s32SetVolumeDb = g_s32VolValue * (MAX_ADJUST_AO_VOLUME-MIN_ADJUST_AO_VOLUME) / 100 + MIN_ADJUST_AO_VOLUME;
-    else
-    	s32SetVolumeDb = MIN_AO_VOLUME;
-
-    MI_AO_SetVolume(AoDevId, s32SetVolumeDb);
-    MI_AO_SetMute(AoDevId, g_bMute);
-    SetMuteStatus(g_bMute);
-
-    /* get AO volume */
-    MI_AO_GetVolume(AoDevId, &s32GetVolumeDb);
-
-    return 0;
-}
-
-void StopPlayAudio()
-{
-    MI_AUDIO_DEV AoDevId = AUDIO_DEV;
-    MI_AO_CHN AoChn = AUDIO_CHN;
-
-    system("echo 0 > /sys/class/gpio/gpio12/value");
-
-    /* disable ao channel of */
-    MI_AO_DisableChn(AoDevId, AoChn);
-
-    /* disable ao device */
-    MI_AO_Disable(AoDevId);
-
-    MI_AO_DeInitDev();
-}
-
-MI_S32 StartPlayVideo()
-{
-    MI_DISP_ShowInputPort(DISP_LAYER, DISP_INPUTPORT);
-    return 0;
-}
-
-void StopPlayVideo()
-{
-    MI_DISP_ClearInputPortBuffer(DISP_LAYER, DISP_INPUTPORT, TRUE);
-    MI_DISP_HideInputPort(DISP_LAYER, DISP_INPUTPORT);
-}
-
-MI_S32 CreatePlayerDev()
-{
-    /*MI_SYS_ChnPort_t stDivpChnPort;
-    MI_DIVP_ChnAttr_t stDivpChnAttr;
-    MI_DIVP_OutputPortAttr_t stOutputPortAttr;
-
-    MI_U32 u32InputPort = DISP_INPUTPORT;
-    MI_DISP_DEV dispDev = DISP_DEV;
-    MI_DISP_LAYER dispLayer = DISP_LAYER;
-    MI_SYS_ChnPort_t stDispChnPort;
-    MI_DISP_RotateConfig_t stRotateConfig;*/
-
-    MI_DISP_InputPortAttr_t stInputPortAttr;
-    MI_DISP_InitParam_t stInitDispParam;
-    memset(&stInitDispParam, 0x0, sizeof(MI_DISP_InitParam_t));
-    stInitDispParam.u32DevId = 0;
-    stInitDispParam.u8Data = NULL;
-    MI_DISP_InitDev(&stInitDispParam);
-
-    system("echo 12 > /sys/class/gpio/export");
-    system("echo out > /sys/class/gpio/gpio12/direction");
-    //system("echo 1 > /sys/class/gpio/gpio12/value");
-
-    // 1.初始化DISP模块
-    memset(&stInputPortAttr, 0, sizeof(MI_DISP_InputPortAttr_t));
-    MI_DISP_GetInputPortAttr(0, 0, &stInputPortAttr);
-    stInputPortAttr.u16SrcWidth         = ALIGN_DOWN(g_playViewWidth , 32);
-    stInputPortAttr.u16SrcHeight        = ALIGN_DOWN(g_playViewHeight, 32);
-    stInputPortAttr.stDispWin.u16X      = 0;
-    stInputPortAttr.stDispWin.u16Y      = 0;
-    stInputPortAttr.stDispWin.u16Width  = g_playViewWidth;
-    stInputPortAttr.stDispWin.u16Height = g_playViewHeight;
-
-    printf("disp input: w=%d, h=%d\n", stInputPortAttr.u16SrcWidth, stInputPortAttr.u16SrcHeight);
-
-    // 2.初始化DIVP模块
-    /*memset(&stDivpChnAttr, 0, sizeof(MI_DIVP_ChnAttr_t));
-    stDivpChnAttr.bHorMirror            = FALSE;
-    stDivpChnAttr.bVerMirror            = FALSE;
-    stDivpChnAttr.eDiType               = E_MI_DIVP_DI_TYPE_OFF;
-    stDivpChnAttr.eRotateType           = E_MI_SYS_ROTATE_NONE;
-    stDivpChnAttr.eTnrLevel             = E_MI_DIVP_TNR_LEVEL_OFF;
-    stDivpChnAttr.stCropRect.u16X       = 0;
-    stDivpChnAttr.stCropRect.u16Y       = 0;
-    stDivpChnAttr.stCropRect.u16Width   = 0;
-    stDivpChnAttr.stCropRect.u16Height  = 0;
-    stDivpChnAttr.u32MaxWidth           = 1920;
-    stDivpChnAttr.u32MaxHeight          = 1080;
-
-    MI_DIVP_CreateChn(DIVP_CHN, &stDivpChnAttr);
-    MI_DIVP_StartChn(DIVP_CHN);
-    
-    memset(&stOutputPortAttr, 0, sizeof(MI_DIVP_OutputPortAttr_t));
-    stOutputPortAttr.eCompMode          = E_MI_SYS_COMPRESS_MODE_NONE;
-    stOutputPortAttr.ePixelFormat       = E_MI_SYS_PIXEL_FRAME_YUV_SEMIPLANAR_420;
-    stOutputPortAttr.u32Width           = ALIGN_DOWN(g_playViewWidth , 32);
-    stOutputPortAttr.u32Height          = ALIGN_DOWN(g_playViewHeight, 32);
-
-    // 3.配置旋转属性
-    stRotateConfig.eRotateMode          = E_MI_DISP_ROTATE_NONE;
-    MI_DISP_SetVideoLayerRotateMode(dispLayer, &stRotateConfig);
-
-    if (stRotateConfig.eRotateMode == E_MI_DISP_ROTATE_NONE || stRotateConfig.eRotateMode == E_MI_DISP_ROTATE_180)
-    {
-        stInputPortAttr.u16SrcWidth     = ALIGN_DOWN(g_playViewWidth , 32);
-        stInputPortAttr.u16SrcHeight    = ALIGN_DOWN(g_playViewHeight, 32);
-        stOutputPortAttr.u32Width       = ALIGN_DOWN(g_playViewWidth , 32);
-        stOutputPortAttr.u32Height      = ALIGN_DOWN(g_playViewHeight, 32);
-    }
-    else
-    {
-        stInputPortAttr.u16SrcWidth     = ALIGN_DOWN(g_playViewHeight, 32);
-        stInputPortAttr.u16SrcHeight    = ALIGN_DOWN(g_playViewWidth , 32);
-        stOutputPortAttr.u32Width       = ALIGN_DOWN(g_playViewHeight, 32);
-        stOutputPortAttr.u32Height      = ALIGN_DOWN(g_playViewWidth , 32);
-    }*/
-
-    MI_DISP_DisableInputPort(DISP_LAYER, DISP_INPUTPORT);
-    MI_DISP_SetInputPortAttr(DISP_LAYER, DISP_INPUTPORT, &stInputPortAttr);
-    MI_DISP_EnableInputPort(DISP_LAYER, DISP_INPUTPORT);
-    MI_DISP_SetInputPortSyncMode(DISP_LAYER, DISP_INPUTPORT, E_MI_DISP_SYNC_MODE_FREE_RUN);
-
-    //MI_DIVP_SetOutputPortAttr(0, &stOutputPortAttr);
-
-    //4.绑定DIVP与DISP
-    /*memset(&stDispChnPort, 0, sizeof(MI_SYS_ChnPort_t));
-    stDispChnPort.eModId                = E_MI_MODULE_ID_DISP;
-    stDispChnPort.u32DevId              = DISP_DEV;
-    stDispChnPort.u32ChnId              = 0;
-    stDispChnPort.u32PortId             = DISP_INPUTPORT;
-    
-    memset(&stDivpChnPort, 0, sizeof(MI_SYS_ChnPort_t));
-    stDivpChnPort.eModId                = E_MI_MODULE_ID_DIVP;
-    stDivpChnPort.u32DevId              = 0;
-    stDivpChnPort.u32ChnId              = DIVP_CHN;
-    stDivpChnPort.u32PortId             = 0;
-
-    MI_SYS_SetChnOutputPortDepth(&stDivpChnPort, 0, 3);
-    MI_SYS_BindChnPort(&stDivpChnPort, &stDispChnPort, 30, 30);*/
-
-    return 0;
-}
-
-void DestroyPlayerDev()
-{
-    /*MI_DISP_LAYER dispLayer = DISP_LAYER;
-    MI_U32 u32InputPort = DISP_INPUTPORT;
-    MI_SYS_ChnPort_t stDivpChnPort;
-    MI_SYS_ChnPort_t stDispChnPort;
-    
-    memset(&stDispChnPort, 0, sizeof(MI_SYS_ChnPort_t));
-    stDispChnPort.eModId                = E_MI_MODULE_ID_DISP;
-    stDispChnPort.u32DevId              = DISP_DEV;
-    stDispChnPort.u32ChnId              = 0;
-    stDispChnPort.u32PortId             = DISP_INPUTPORT;
-    
-    memset(&stDivpChnPort, 0, sizeof(MI_SYS_ChnPort_t));
-    stDivpChnPort.eModId                = E_MI_MODULE_ID_DIVP;
-    stDivpChnPort.u32DevId              = 0;
-    stDivpChnPort.u32ChnId              = DIVP_CHN;
-    stDivpChnPort.u32PortId             = 0;
-    
-    MI_SYS_UnBindChnPort(&stDivpChnPort, &stDispChnPort);
-
-    MI_DIVP_StopChn(0);
-    MI_DIVP_DestroyChn(0);*/
-
-    MI_DISP_DisableInputPort(DISP_LAYER, DISP_INPUTPORT);
-    MI_DISP_DeInitDev();
-}
-#endif
 
 int GetImageFileDuration(long long duration)
 {
@@ -703,12 +469,12 @@ int SetImageFileCurrentProgress(long long currentPos)
 	long long curSec = 0;
 	int trackPos = 0;
 
-	printf("currentPos is %lld\n", currentPos);
+	//printf("currentPos is %lld\n", currentPos);
 	curSec = currentPos / 1000000;	//AV_TIME_BASE;
 	trackPos  = (currentPos * mSeekbar_progressPtr->getMax()) / g_duration;
 	memset(curTime, 0, sizeof(curTime));
 	sprintf(curTime, "%02lld:%02lld:%02lld", curSec/3600, (curSec%3600)/60, curSec%60);
-	printf("image curTime: %s\n", curTime);
+	//printf("image curTime: %s\n", curTime);
 	mTextview_curtimePtr->setText(curTime);
 	mSeekbar_progressPtr->setProgress(trackPos);
 
@@ -949,6 +715,21 @@ next:
     }
 
     SetPlayerVolumn(g_s32VolValue);
+
+    // init volumn & mute status
+    memset(&sendevt, 0, sizeof(IPCEvent));
+	sendevt.EventType = IPC_COMMAND_SET_VOLUMN;
+	sendevt.stPlData.volumn = g_s32VolValue;
+	printf("set voice volumn = [%d]\n", sendevt.stPlData.volumn);
+	o_client.Send(sendevt);
+
+	memset(&sendevt, 0, sizeof(IPCEvent));
+	sendevt.EventType = IPC_COMMAND_SET_MUTE;
+	sendevt.stPlData.mute = g_bMute;
+	o_client.Send(sendevt);
+	SetMuteStatus(g_bMute);
+	printf("set mute to %d\n", g_bMute);
+
     printf("End to StartPlayStreamFile\n");
 }
 
@@ -1057,7 +838,7 @@ static void StartDisplayImage(char *pFileName)
 {
 	ImagePlayerCtrl_t stPlayerCtrl;
 
-	printf("Enter StartDisplayImage, fileName is %s\n", pFileName);
+//	printf("Enter StartDisplayImage, fileName is %s\n", pFileName);
 	stPlayerCtrl.fpGetDuration = GetImageFileDuration;
 	stPlayerCtrl.fpGetCurrentPlayPos = GetImageFilePlayPos;
 	stPlayerCtrl.fpDisplayComplete = PlayImageFileComplete;
@@ -1088,12 +869,12 @@ static void StartDisplayImage(char *pFileName)
 	mTextView_picPtr->setBackgroundPic(pFileName);
 
 	mTextView_picPtr->setVisible(true);
-	printf("Leave StartDisplayImage\n");
+//	printf("Leave StartDisplayImage\n");
 }
 
 static void StopDisplayImage()
 {
-	printf("Enter StopDisplayImage\n");
+//	printf("Enter StopDisplayImage\n");
 	ImagePlayer_Deinit(g_pstImagePlayer);
 	//StopPlayAudio();
 
@@ -1101,7 +882,7 @@ static void StopDisplayImage()
 	mTextview_curtimePtr->setText("00:00:00");
 	mSeekbar_progressPtr->setProgress(0);
 
-	printf("Leave StopDisplayImage\n");
+//	printf("Leave StopDisplayImage\n");
 }
 
 static void TogglePlayImageFile()
@@ -1120,6 +901,7 @@ static void StopPlayFile()
 static void StartPlayFile(char *pFileName)
 {
 	g_bPlayCompleted = false;
+	g_duration = 0;
 	g_playStream = IsMediaStreamFile(pFileName);
 
 	if (g_playStream)
@@ -1136,8 +918,24 @@ static void StartPlayFile(char *pFileName)
 	strcpy(filePath, pFileName);
 	p = strrchr(filePath, '/');
 	*p = 0;
+
+	printf("filePath： %s. pFileName: %s\n", filePath, pFileName);
+
 	mTextview_fileNamePtr->setText(pFileName+strlen(filePath)+1);
 	SetPlayingStatus(true);
+
+	switch (g_eRepeatMode)
+	{
+	case FILE_REPEAT_MODE:
+		mButton_circlemodePtr->setBackgroundPic("player/singlerepeat.png");
+		break;
+	case LIST_REPEAT_MODE:
+		mButton_circlemodePtr->setBackgroundPic("player/listrepeat.png");
+		break;
+	default:
+		printf("invalid repeat mode, mode=%d\n", (int)g_eRepeatMode);
+		break;
+	}
 	//AutoDisplayToolbar();
 }
 
@@ -1260,6 +1058,7 @@ static void *PlayFileProc(void *pData)
 
 			StopPlayFile();
 			StartPlayFile(curFileName);
+			gettimeofday(&pant_start, NULL);
 		}
 		else
 		{
@@ -1273,6 +1072,7 @@ static void *PlayFileProc(void *pData)
 					strncpy(curFileName, nextFileName, sizeof(curFileName));
 					StopPlayFile();
 					StartPlayFile(curFileName);
+					gettimeofday(&pant_start, NULL);
 				}
 			}
 			else if (eSkipMode == SKIP_PREV)
@@ -1285,92 +1085,110 @@ static void *PlayFileProc(void *pData)
 					strncpy(curFileName, prevFileName, sizeof(curFileName));
 					StopPlayFile();
 					StartPlayFile(curFileName);
+					gettimeofday(&pant_start, NULL);
 				}
 			}
 		}
 
-        if (g_playStream) {
+        if (g_playStream)
+        {
             memset(&recvevt, 0, sizeof(IPCEvent));
-            if (i_server.Read(recvevt) > 0) {
+            if (i_server.Read(recvevt) > 0)
+            {
                 switch (recvevt.EventType)
                 {
-                    case IPC_COMMAND_GET_DURATION : {
-                        char totalTime[32];
-                        long int durationSec = recvevt.stPlData.misc / 1.0;
+                    case IPC_COMMAND_GET_DURATION:
+                    	{
+                    		//printf("read cmd:get_duration, id:%d\n", IPC_COMMAND_GET_DURATION);
+							char totalTime[32];
+							long int durationSec = recvevt.stPlData.misc / 1.0;
 
-                        if (durationSec / 3600 < 99) {
-                            memset(totalTime, 0, sizeof(totalTime));
-                            sprintf(totalTime, "%02d:%02d:%02d", durationSec/3600, (durationSec%3600)/60, durationSec%60);
-                            mTextview_durationPtr->setText(totalTime);
-                            g_duration = durationSec;
-                            printf("file duration time = %lld\n", g_duration);
-                        }
-                    }
-                    break;
+							if (durationSec / 3600 < 99)
+							{
+								memset(totalTime, 0, sizeof(totalTime));
+								sprintf(totalTime, "%02d:%02d:%02d", durationSec/3600, (durationSec%3600)/60, durationSec%60);
+								mTextview_durationPtr->setText(totalTime);
+								g_duration = durationSec;
+								//printf("file duration time = %lld\n", g_duration);
+							}
+						}
+						break;
+                    case IPC_COMMAND_GET_POSITION:
+                    	{
+                    		//printf("read cmd:get_position, id:%d\n", IPC_COMMAND_GET_POSITION);
+							char curTime[32];
+							int curSec = recvevt.stPlData.misc / 1.0;
+							int trackPos;
+							//printf("get video current position time = %d\n", curSec);
+							memset(curTime, 0, sizeof(curTime));
+							sprintf(curTime, "%02d:%02d:%02d", curSec/3600, (curSec%3600)/60, curSec%60);
+							mTextview_curtimePtr->setText(curTime);
 
-                    case IPC_COMMAND_GET_POSITION : {
-                        char curTime[32];
-                        int curSec = recvevt.stPlData.misc / 1.0;
-                        int trackPos;
-                        //printf("get video current position time = %d\n", curSec);
-                        memset(curTime, 0, sizeof(curTime));
-                        sprintf(curTime, "%02d:%02d:%02d", curSec/3600, (curSec%3600)/60, curSec%60);
-                        mTextview_curtimePtr->setText(curTime);
+							//printf("g_duration is %lld\n", g_duration);
 
-                        trackPos  = (curSec * mSeekbar_progressPtr->getMax()) / g_duration;
-                        mSeekbar_progressPtr->setProgress(trackPos);
-                    }
-                    break;
+							if (g_duration > 0)
+							{
+								trackPos  = (curSec * mSeekbar_progressPtr->getMax()) / g_duration;
+								mSeekbar_progressPtr->setProgress(trackPos);
+								//printf("curPos: %d\n", trackPos);
+							}
+						}
+						break;
+                    case IPC_COMMAND_ERROR:
+                    	{
+							if (recvevt.stPlData.status == -101)
+								mTextview_msgPtr->setText("请检查网络连接！");
+							else if (recvevt.stPlData.status == -2)
+								mTextview_msgPtr->setText("不支持播放720P以上的视频！");
+							else if (recvevt.stPlData.status == -3)
+								mTextview_msgPtr->setText("解码速度不够，请降低视频帧率！");
+							else if (recvevt.stPlData.status == -4)
+								mTextview_msgPtr->setText("读取网络超时！");
+							else
+								mTextview_msgPtr->setText("Other Error Occur!");
 
-                    case IPC_COMMAND_ERROR : {
-                        if (recvevt.stPlData.status == -101)
-                            mTextview_msgPtr->setText("请检查网络连接！");
-                        else if (recvevt.stPlData.status == -2)
-                            mTextview_msgPtr->setText("不支持播放720P以上的视频！");
-                        else if (recvevt.stPlData.status == -3)
-                            mTextview_msgPtr->setText("解码速度不够，请降低视频帧率！");
-                        else if (recvevt.stPlData.status == -4)
-                            mTextview_msgPtr->setText("读取网络超时！");
-                        else
-                            mTextview_msgPtr->setText("Other Error Occur!");
+							mWindow_errMsgPtr->setVisible(true);
 
-                        mWindow_errMsgPtr->setVisible(true);
+							pthread_mutex_lock(&g_playFileMutex);
+							g_bPlayError = true;
+							pthread_mutex_unlock(&g_playFileMutex);
+							printf("[%s] play error!\n", curFileName);
+						}
+                    	break;
+                    case IPC_COMMAND_COMPLETE:
+                    	{
+                    		printf("read cmd:play_complete, id:%d\n", IPC_COMMAND_COMPLETE);
+							SetPlayingStatus(false);
+							mTextview_speedPtr->setText("");
+							g_bShowPlayToolBar = FALSE;
+							g_bPantStatus = false;
 
-                        pthread_mutex_lock(&g_playFileMutex);
-                        g_bPlayError = true;
-                        pthread_mutex_unlock(&g_playFileMutex);
-                        printf("[%s] play error!\n", curFileName);
-                    }
-                    break;
-
-                    case IPC_COMMAND_COMPLETE : {
-                        SetPlayingStatus(false);
-                        mTextview_speedPtr->setText("");
-                        g_bShowPlayToolBar = FALSE;
-                        g_bPantStatus = false;
-
-                        pthread_mutex_lock(&g_playFileMutex);
-                        g_bPlayCompleted = true;
-                        pthread_mutex_unlock(&g_playFileMutex);
-                        printf("[%s] play complete!\n", curFileName);
-                    }
-                    break;
-
-                    case IPC_COMMAND_PANT : {
-                        g_bPantStatus = true;
-                        gettimeofday(&pant_start, NULL);
-                        if(!o_client.Init()) {
-                            printf("[%s %d]my_player process not start!\n", __FILE__, __LINE__);
-                            fprintf(stderr, "Error：%s\n", strerror(errno));
-                        } else {
-                            memset(&sendevt, 0, sizeof(IPCEvent));
-                            sendevt.EventType = IPC_COMMAND_PANT;
-                            o_client.Send(sendevt);
-                        }
-                    }
-                    break;
-
-                    default : break;
+							pthread_mutex_lock(&g_playFileMutex);
+							g_bPlayCompleted = true;
+							pthread_mutex_unlock(&g_playFileMutex);
+							printf("[%s] play complete!\n", curFileName);
+						}
+						break;
+                    case IPC_COMMAND_PANT :
+                    	{
+                    		//printf("read cmd:heart_beat, id:%d\n", IPC_COMMAND_PANT);
+							g_bPantStatus = true;
+							gettimeofday(&pant_start, NULL);
+							if(!o_client.Init())
+							{
+								printf("[%s %d]my_player process not start!\n", __FILE__, __LINE__);
+								fprintf(stderr, "Error：%s\n", strerror(errno));
+							}
+							else
+							{
+								memset(&sendevt, 0, sizeof(IPCEvent));
+								sendevt.EventType = IPC_COMMAND_PANT;
+								o_client.Send(sendevt);
+							}
+						}
+						break;
+                    default :
+                    	break;
                 }
             }
 
@@ -1862,12 +1680,15 @@ static void onProgressChanged_Seekbar_volumn(ZKSeekBar *pSeekBar, int progress) 
         printf("my_player is not start!\n");
         return;
     }
+
+    g_s32VolValue = progress;
 	memset(&sendevt, 0, sizeof(IPCEvent));
 	sendevt.EventType = IPC_COMMAND_SET_VOLUMN;
 	sendevt.stPlData.volumn = GetPlayerVolumn();
 	printf("set voice volumn = [%d]\n", sendevt.stPlData.volumn);
 	o_client.Send(sendevt);
 
+	g_bMute = 0;
 	SetMuteStatus(g_bMute);
 }
 static bool onButtonClick_Button_confirm(ZKButton *pButton) {

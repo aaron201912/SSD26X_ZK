@@ -80,16 +80,31 @@ static S_ButtonCallback sButtonCallbackTab[] = {
 
 
 typedef void (*SeekBarCallback)(ZKSeekBar *pSeekBar, int progress);
+typedef void (*SeekBarTrackCallback)(ZKSeekBar *pSeekBar);
 typedef struct {
     int id;
     SeekBarCallback callback;
 }S_ZKSeekBarCallback;
+typedef struct {
+	int id;
+	SeekBarTrackCallback callback;
+}S_ZKSeekBarTrackCallback;
+
 /*TAG:SeekBarCallbackTab*/
 static S_ZKSeekBarCallback SZKSeekBarCallbackTab[] = {
     ID_PLAYER_Seekbar_volumn, onProgressChanged_Seekbar_volumn,
     ID_PLAYER_Seekbar_progress, onProgressChanged_Seekbar_progress,
 };
 
+// start track touch
+static S_ZKSeekBarTrackCallback SZKSeekBarStartTrackCallbackTab[] = {
+    ID_PLAYER_Seekbar_progress, onStartTrackingTouch_Seekbar_progress,
+};
+
+// stop track touch
+static S_ZKSeekBarTrackCallback SZKSeekBarStopTrackCallbackTab[] = {
+    ID_PLAYER_Seekbar_progress, onStopTrackingTouch_Seekbar_progress,
+};
 
 typedef int (*ListViewGetItemCountCallback)(const ZKListView *pListView);
 typedef void (*ListViewobtainListItemDataCallback)(ZKListView *pListView,ZKListView::ZKListItem *pListItem, int index);
@@ -246,6 +261,28 @@ void playerActivity::onProgressChanged(ZKSeekBar *pSeekBar, int progress){
         }
     }
 }
+void playerActivity::onStartTrackingTouch(ZKSeekBar *pSeekBar){
+	printf("start tracking touch\n");
+	int seekBarTablen = sizeof(SZKSeekBarStartTrackCallbackTab) / sizeof(SZKSeekBarStartTrackCallbackTab);
+	for (int i = 0; i < seekBarTablen; ++i) {
+		if (SZKSeekBarStartTrackCallbackTab[i].id == pSeekBar->getID()) {
+			SZKSeekBarStartTrackCallbackTab[i].callback(pSeekBar);
+			break;
+		}
+	}
+}
+
+void playerActivity::onStopTrackingTouch(ZKSeekBar *pSeekBar){
+	printf("stop tracking touch\n");
+	int seekBarTablen = sizeof(SZKSeekBarStopTrackCallbackTab) / sizeof(SZKSeekBarStopTrackCallbackTab);
+	for (int i = 0; i < seekBarTablen; ++i) {
+		if (SZKSeekBarStopTrackCallbackTab[i].id == pSeekBar->getID()) {
+			SZKSeekBarStopTrackCallbackTab[i].callback(pSeekBar);
+			break;
+		}
+	}
+}
+
 
 int playerActivity::getListItemCount(const ZKListView *pListView) const{
     int tablen = sizeof(SListViewFunctionsCallbackTab) / sizeof(S_ListViewFunctionsCallback);

@@ -65,7 +65,8 @@ class playerActivity : public Activity,
 public:
     playerActivity();
     virtual ~playerActivity();
-
+	void onStartTrackingTouch(ZKSeekBar *pSeekBar);
+	void onStopTrackingTouch(ZKSeekBar *pSeekBar);
     /**
      * 注册定时器
      */
