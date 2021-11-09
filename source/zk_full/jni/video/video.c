@@ -517,12 +517,12 @@ MI_S32 SSTAR_DestroyVdec2DispPipe(MI_S32 s32VdecChn, MI_S32 s32DivpChn)
 {
     SSTAR_ModuleUnBind(E_MI_MODULE_ID_VDEC, 0, s32VdecChn, 0,
                     E_MI_MODULE_ID_DISP, 0, 0, 0); //DIVP->DISP
-    SSTAR_DestroyVdecChannel(s32VdecChn);
     MI_DISP_DisableInputPort(0, 0);
+    SSTAR_DestroyVdecChannel(s32VdecChn);
 
     //MI_VDEC_DeInitDev();
     MI_VDEC_DestroyDev(0);
-    MI_DISP_DeInitDev();
+    //MI_DISP_DeInitDev();
 
     return MI_SUCCESS;
 }
