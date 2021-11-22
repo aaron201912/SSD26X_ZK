@@ -29,6 +29,23 @@
 #define AUDIO_OUT_MONO_FILE		"/customer/res/8K_16bit_MONO.wav"
 #define AUDIO_OUT_STEREO_FILE	"/customer/res/8K_16bit_STERO_30s.wav"
 
+#ifndef ExecFunc
+#define ExecFunc(_func_, _ret_) \
+    do{ \
+        MI_S32 s32Ret = MI_SUCCESS; \
+        s32Ret = _func_; \
+        if (s32Ret != _ret_) \
+        { \
+            printf("[%s %d]exec function failed, error:%x\n", __func__, __LINE__, s32Ret); \
+            return s32Ret; \
+        } \
+        else \
+        { \
+            printf("[%s %d]exec function pass\n", __func__, __LINE__); \
+        } \
+    } while(0)
+#endif
+
 typedef enum
 {
   E_AENC_TYPE_G711A = 0,
@@ -488,12 +505,12 @@ int SSTAR_AO_StartPlayFile(MI_AUDIO_DEV aoDevId, char *pPcmFile, int volume)
 	g_stAudioOutAssembly.pfnAoSetVolume(aoDevId, 0, volume, E_MI_AO_GAIN_FADING_OFF);
 	g_stAudioOutAssembly.pfnAoGetVolume(aoDevId, 0, &s32AoGetVolume);
 #else
-	MI_AO_SetPubAttr(aoDevId, &stAoSetAttr);
-	MI_AO_GetPubAttr(aoDevId, &stAoGetAttr);
-	MI_AO_Enable(aoDevId);
-	MI_AO_EnableChn(aoDevId, 0);
-	MI_AO_SetVolume(aoDevId, 0, volume, E_MI_AO_GAIN_FADING_OFF);
-	MI_AO_GetVolume(aoDevId, 0, &s32AoGetVolume);
+	ExecFunc(MI_AO_SetPubAttr(aoDevId, &stAoSetAttr), MI_SUCCESS);
+	ExecFunc(MI_AO_GetPubAttr(aoDevId, &stAoGetAttr), MI_SUCCESS);
+	ExecFunc(MI_AO_Enable(aoDevId), MI_SUCCESS);
+	ExecFunc(MI_AO_EnableChn(aoDevId, 0), MI_SUCCESS);
+	ExecFunc(MI_AO_SetVolume(aoDevId, 0, volume, E_MI_AO_GAIN_FADING_OFF), MI_SUCCESS);
+	ExecFunc(MI_AO_GetVolume(aoDevId, 0, &s32AoGetVolume), MI_SUCCESS);
 #endif
 
 	g_s32NeedSize = stAoSetAttr.u32PtNumPerFrm * 2 * stAoSetAttr.u32ChnCnt * g_stWavHeaderInput.wave.wChannels;
@@ -536,9 +553,9 @@ int SSTAR_AO_StopPlayFile(MI_AUDIO_DEV aoDevId)
 
 	SSTAR_AO_CloseLibrary(&g_stAudioOutAssembly);
 #else
-	MI_AO_DisableChn(aoDevId, 0);
-	MI_AO_Disable(aoDevId);
-	MI_AO_DeInitDev();
+	ExecFunc(MI_AO_DisableChn(aoDevId, 0), MI_SUCCESS);
+	ExecFunc(MI_AO_Disable(aoDevId), MI_SUCCESS);
+	//MI_AO_DeInitDev();
 #endif
 
 	return 0;
