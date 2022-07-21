@@ -12,7 +12,7 @@ STRIP = arm-linux-gnueabihf-strip
 USE_BOOTUP:=0
 
 ENABLE_HDMI:=0
-ENABLE_MIPI:=1
+ENABLE_MIPI:=0
 
 CFLAGS = -I$(ZKGUI_PATH)/include -I$(ZKGUI_PATH)/include/freetype2 -I$(ZKGUI_PATH)/include/easyui -I$(PROJECT_PATH)/include
 LDFLAGS = -L$(ZKGUI_PATH)/lib -L$(PROJECT_PATH)/lib

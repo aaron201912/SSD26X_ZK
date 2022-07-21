@@ -77,12 +77,12 @@ int sstar_disp_init()
 
     //init panel
 #if ENABLE_MIPI
-    //eIntfType = E_MI_PNL_INTF_MIPI_DSI;
+    eIntfType = E_MI_PNL_INTF_MIPI_DSI;
 #else
     eIntfType = E_MI_PNL_INTF_TTL;
+#endif
     MI_PANEL_Init(eIntfType);
 	MI_PANEL_GetPanelParam(eIntfType, &pstParamCfg);
-#endif
 
     return 0;
 }
@@ -90,7 +90,7 @@ int sstar_disp_init()
 int sstar_disp_Deinit()
 {
 #if ENABLE_MIPI
-    //MI_PANEL_IntfType_e eIntfType = E_MI_PNL_INTF_MIPI_DSI;
+    MI_PANEL_IntfType_e eIntfType = E_MI_PNL_INTF_MIPI_DSI;
 #else
     MI_PANEL_IntfType_e eIntfType = E_MI_PNL_INTF_TTL;
 #endif
@@ -106,17 +106,9 @@ int sstar_disp_Deinit()
 //           (int)stBackLightCfg.bEn, (int)stBackLightCfg.u8PwmNum, stBackLightCfg.u32Duty, stBackLightCfg.u32Period);
 //    stBackLightCfg.u32Duty = 0;
 //    MI_PANEL_SetBackLight(eIntfType, &stBackLightCfg);
-#if ENABLE_MIPI
-    //MI_PANEL_DeInit();
-#else
     MI_PANEL_DeInit();
-#endif
 	MI_DISP_DeInitDev();
-#if ENABLE_MIPI
-    //MI_PANEL_DeInitDev();
-#else
-    MI_PANEL_DeInitDev();
-#endif
+	MI_PANEL_DeInitDev();
     MI_SYS_Exit(0);
     printf("sstar_disp_Deinit...\n");
 
